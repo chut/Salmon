@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Salmon_DroidBox</string>
+	<string name="task_working">Working (%1$d)...</string>
+    <string name="task_working2">Working...</string>
+    <string name="task_starting">Starting...</string>
+    <string name="task_cancelled">Task is cancelled by user</string>
+    <string name="task_completed">Task is completed with result (%1$s) of type (%2$s)</string>
+
+</resources>
