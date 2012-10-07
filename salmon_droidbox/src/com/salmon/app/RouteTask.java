@@ -9,7 +9,7 @@ import android.widget.Toast;
 import com.salmon.app.async_core.TaskBase;
 import com.salmon.app.async_core.UIHandler;
 
-public class RouteTask extends TaskBase<Integer> {
+public class RouteTask<E1, E2> extends TaskBase<Integer, E1, E2> {
 	
 	private final Context context;
 	private final Route route;

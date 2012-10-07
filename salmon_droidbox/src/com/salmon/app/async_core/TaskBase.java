@@ -11,7 +11,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.util.Log;
 import android.widget.ProgressBar;
 
-public abstract class TaskBase<V> implements Callable<V>, OnCancelListener {
+public abstract class TaskBase<V, E1, E2> implements Callable<V>, OnCancelListener {
 	
 	protected final UIHandler handlerUI;
 	protected Activity mActivity;
@@ -19,6 +19,7 @@ public abstract class TaskBase<V> implements Callable<V>, OnCancelListener {
 	protected boolean bHasIndeterminateProgressBar;
 	protected ProgressDialog mProgressDialog;
 	protected Future<V> future;
+	protected PostRunnableBase<E1, E2> resultTask;
 	private boolean bToggleProgress;
 	
 	public TaskBase(UIHandler handlerUI) {
@@ -28,6 +29,7 @@ public abstract class TaskBase<V> implements Callable<V>, OnCancelListener {
 		this.bHasIndeterminateProgressBar = false;
 		this.mProgressDialog = null;
 		this.future = null;				// used for canceling task
+		this.resultTask = null;			// posted to the UI thread
 		this.bToggleProgress = false;
 	}
    
@@ -57,6 +59,10 @@ public abstract class TaskBase<V> implements Callable<V>, OnCancelListener {
 		this.mActivity = mActivity;
 		this.bHasIndeterminateProgressBar = true;
 		Log.i("TAG","addIndeterminateProgressBar");
+	}
+	
+	public final void setResultTask(PostRunnableBase<E1, E2> resultTask) {
+		this.resultTask = resultTask;
 	}
 	
 	public final void toggleProgress() {

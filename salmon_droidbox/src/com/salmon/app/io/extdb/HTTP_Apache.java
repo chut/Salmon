@@ -11,6 +11,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import com.salmon.app.io.DatabaseConstants;
+import com.salmon.app.io.IDatabaseProvider;
+
 public class HTTP_Apache implements IDatabaseProvider {
 	
 	public HTTP_Apache() {
@@ -29,24 +32,24 @@ public class HTTP_Apache implements IDatabaseProvider {
 		
 		httpclient = new DefaultHttpClient();
 		
-		String url = ExtDbConstants.BASE_URL;
+		String url = DatabaseConstants.BASE_URL;
 		
 		switch (queryType) {
-		case ExtDbConstants.QUERY_NEIGHBORS:
+		case DatabaseConstants.QUERY_NEIGHBORS:
 			//System.out.println("neighbors");
 			
 			// construct URL address
 			if (strValue.length == 1) {
 				// nodeID was passed.  base SQL off nodeID
-				url = url + "?type=" + ExtDbConstants.QUERY_NEIGHBORS + "&nid=" + strValue[0];
+				url = url + "?type=" + DatabaseConstants.QUERY_NEIGHBORS + "&nid=" + strValue[0];
 			} else {
 				// buildingID and floorID were passed.  base SQL off of those.
-				url = url + "?type=" + ExtDbConstants.QUERY_NEIGHBORS + "&bid=" + strValue[0] + "&fid=" + strValue[1].replaceAll("\\s", "*");
+				url = url + "?type=" + DatabaseConstants.QUERY_NEIGHBORS + "&bid=" + strValue[0] + "&fid=" + strValue[1].replaceAll("\\s", "*");
 			}
 			
 			break;
-		case ExtDbConstants.QUERY_ALLDATA:
-			url = url + "?type=" + ExtDbConstants.QUERY_ALLDATA;
+		case DatabaseConstants.QUERY_ALLDATA:
+			url = url + "?type=" + DatabaseConstants.QUERY_ALLDATA;
 			
 			break;	
 		default:
@@ -67,8 +70,8 @@ public class HTTP_Apache implements IDatabaseProvider {
 				
 				instream = entity.getContent();
 				
-				int bufferLen = ExtDbConstants.BUFFERSIZE;
-				byte[] b = new byte[ExtDbConstants.BUFFERSIZE];
+				int bufferLen = DatabaseConstants.BUFFERSIZE;
+				byte[] b = new byte[DatabaseConstants.BUFFERSIZE];
 				String[] buffer = null;
 				
 				//System.out.println("Start - bufferLen: " + bufferLen);

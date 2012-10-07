@@ -1,5 +1,5 @@
 package com.salmon.app.io;
 
-public class FileIOTask {
+public class Task_FileIO {
 
 }

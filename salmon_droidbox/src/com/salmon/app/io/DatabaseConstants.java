@@ -1,6 +1,11 @@
-package com.salmon.app.io.sqlite;
+package com.salmon.app.io;
 
-public class SQLiteConstants {
+public class DatabaseConstants {
+	// External Database Constants
+	public static final String BASE_URL = "http://wayfinder.mapsdb.com/cs460spr2012dev/DBservlet";
+	public static final int BUFFERSIZE = 1000;
+	
+	// Internal (SQLite) Constants
 	public static final String DATABASE_NAME = "wayfinder.db";
 	public static final int DATABASE_VERSION = 1;
 	
@@ -62,22 +67,19 @@ public class SQLiteConstants {
 			KEY_NEIGHBOR_DISTANCE
 		};
 	
-	// query types
-	public static final int QUERY_SYNC_DB = 1;
-	public static final int QUERY_LOAD_APP = 2;
-	public static final int QUERY_ALLDATA = 3;
-	public static final int QUERY_NODES_ALL = 4;
-	public static final int QUERY_NODES_BY_FLOOR = 5;
-	public static final int QUERY_NODES_BY_TYPE = 6;
-	public static final int QUERY_DISPLAY_ALLDATA = 7;		// used in testing - synchs, and then displays all data in text view
+	// Common - query types
+	public static final int QUERY_NEIGHBORS = 1;
+	public static final int QUERY_ALLDATA = 2;
+	public static final int QUERY_DEBUGMAPDATA = 3;			// used in web-based database verify tool
 	
-	// progress options
-	public static final int PROGRESS_NONE = 0;
-	public static final int PROGRESS_BAR = 1;
-	public static final int PROGRESS_BAR_INDETERMINATE = 2;
-	public static final int PROGRESS_DIALOG = 3;
+	public static final int QUERY_SYNC_DB = 4;
+	public static final int QUERY_LOAD_APP = 5;
+	public static final int QUERY_NODES_ALL = 6;
+	public static final int QUERY_NODES_BY_FLOOR = 7;
+	public static final int QUERY_NODES_BY_TYPE = 8;
+	public static final int QUERY_DISPLAY_ALLDATA = 9;		// used in testing - synchs, and then displays all data in text view
 	
-	// query status codes
+	// Common - query status codes
 	public static final String RESULT_SUCCESS = "success";
 	public static final String RESULT_FAILED = "failed";
 	

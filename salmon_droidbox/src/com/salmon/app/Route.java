@@ -9,9 +9,8 @@ import java.util.ListIterator;
 
 import android.util.Log;
 
-import com.salmon.app.io.extdb.ExtDbConstants;
+import com.salmon.app.io.IDatabaseProvider;
 import com.salmon.app.io.extdb.HTTP_Apache;
-import com.salmon.app.io.extdb.IDatabaseProvider;
 import com.salmon.app.io.extdb.Socket;
 import com.metrics.MetricGroup;
 
@@ -30,7 +29,6 @@ public class Route {
 	// fields
 	private String routeID;
 	private ArrayList<RouteStep> routeStepList;
-	//private ArrayList<Node> nodeList;
 	private ArrayList<Node> nodeList;
 	private Node startNode;
 	private Node endNode;
@@ -47,33 +45,42 @@ public class Route {
 	
 	private IDatabaseProvider dbConn;
 	private MetricGroup myMetrics;
-	//private JTextArea blackboxOutput;
 	
-	// constructor
+	// constructor 
 	/**********************************************************
-	 * public public Route()
+	 * public Route()
 	 **********************************************************
+	 * description:	Constructor used when you have the start and 
+	 * 				end node objects (as opposed to just their
+	 * 				string IDs)
+	 * 				Note - this constructor is used primarily in
+	 * 					test environments.  
 	 * constructor:	
 	 * creator:		Ken Richards, 02/11/2012
 	 * modified:	
+	 * @return 
 	 *********************************************************/
 	public Route(String routeID, Node startNode, Node endNode) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		
 		// setup database connection provider
-		switch (ExtDbConstants.DATABASE_PROVIDER) {
-		case ExtDbConstants.PROVIDER_HTTP_APACHE:
+		switch (AppConstants.DATABASE_PROVIDER) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			break;
 		
-		case ExtDbConstants.PROVIDER_SOCKET:
+		case AppConstants.PROVIDER_EXT_SOCKET:
 			dbConn = new Socket();
 			break;
-
+			
+		case AppConstants.PROVIDER_INT_SQLITE:
+			// TODO SQLITE dbConn = new Socket();
+			break;
+		
 		default:
-			// default to HTTP_APACHE
-			dbConn = new HTTP_Apache();
+			// TODO default to SQLITE
+			//dbConn = new HTTP_Apache();
 			
 			break;
 		}
@@ -89,24 +96,39 @@ public class Route {
 	}
 
 	// overload constructor
+	/**********************************************************
+	 * public Route()
+	 **********************************************************
+	 * description:	Constructor used when you have the start and 
+	 * 				end node string IDs
+	 * 				Note - this constructor is used primarily in
+	 * 					test environments.  
+	 * constructor:	
+	 * creator:		Ken Richards
+	 * modified:	
+	 *********************************************************/
 	public Route(String routeID, String startNodeID, String endNodeID, String ... settings) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		myMetrics.setDbaseProvider(getDatabaseProvider());
 		
 		// setup database connection provider
-		switch (ExtDbConstants.DATABASE_PROVIDER) {
-		case ExtDbConstants.PROVIDER_HTTP_APACHE:
+		switch (AppConstants.DATABASE_PROVIDER) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			break;
 		
-		case ExtDbConstants.PROVIDER_SOCKET:
+		case AppConstants.PROVIDER_EXT_SOCKET:
 			dbConn = new Socket();
 			break;
-
+			
+		case AppConstants.PROVIDER_INT_SQLITE:
+			// TODO SQLITE dbConn = new Socket();
+			break;
+		
 		default:
-			// default to HTTP_APACHE
-			dbConn = new HTTP_Apache();
+			// TODO default to SQLITE
+			//dbConn = new HTTP_Apache();
 			
 			break;
 		}
@@ -127,9 +149,10 @@ public class Route {
 			//this.endNode = getNodeByID(endNodeID);
 		}	
 		
-		if (settings.length > 0) {
+		int arrayLength = settings.length;
+		if (arrayLength > 0) {
 			String[] mySetting = null;
-			for (int i = 0; i < settings.length; i++) {
+			for (int i = 0; i < arrayLength; i++) {
 				mySetting = settings[i].split("=");
 				if (mySetting[0].equals("verbose")) {this.verbose = mySetting[1].toLowerCase().equals("true");}
 				else if (mySetting[0].equals("soe")) {this.stairsOrElevator = mySetting[1].toLowerCase();}				
@@ -138,19 +161,32 @@ public class Route {
 		
 	}
 	
+	// overload constructor
+	/**********************************************************
+	 * public Route()
+	 **********************************************************
+	 * description:	Constructor used to create object in app
+	 * 				Note - after object is created, use the setup()
+	 * 					method to pass start/end IDs, and verbose/stairs settings.
+	 * 					After setup info has been passed, use initialize()  
+	 * constructor:	
+	 * creator:		Ken Richards
+	 * modified:	
+	 *********************************************************/
 	public Route() {
 		// intentionally left blank.  intention is to only create object.  use setup() and initialize() to complete object setup
-		this.nodeList = new ArrayList<Node>(); // this is also initialized below (line 188). do we need to do this twice???
 	}
 	
+	// this is a low cost method, meant to be run from the GUI thread
 	public void setup(String routeID, String startNodeID, String endNodeID, String ... settings) {
 		this.routeID = routeID;
 		this.startNodeID = startNodeID;
 		this.endNodeID = endNodeID;
 		
-		if (settings.length > 0) {
+		int arrayLength = settings.length;
+		if (arrayLength > 0) {
 			String[] mySetting = null;
-			for (int i = 0; i < settings.length; i++) {
+			for (int i = 0; i < arrayLength; i++) {
 				mySetting = settings[i].split("=");
 				if (mySetting[0].equals("verbose")) {this.verbose = mySetting[1].toLowerCase().equals("true");}
 				else if (mySetting[0].equals("soe")) {this.stairsOrElevator = mySetting[1].toLowerCase();}				
@@ -158,24 +194,35 @@ public class Route {
 		}
 	}
 	
+	// this is a relatively high cost method.  
+	// call this method from the same thread that Route.calculate() will run on
+	// i.e. Don't call this method from the GUI thread
 	public Route initialize() {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		myMetrics.setDbaseProvider(getDatabaseProvider());
 		
 		// setup database connection provider
-		switch (ExtDbConstants.DATABASE_PROVIDER) {
-		case ExtDbConstants.PROVIDER_HTTP_APACHE:
+		// TODO change this to AppConstants
+		// TODO create option for PROVIDER_SQLITE
+		switch (AppConstants.DATABASE_PROVIDER) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			Log.i("ROUTE","Provider - HTTP_Apache");
 			break;
 		
-		case ExtDbConstants.PROVIDER_SOCKET:
+		case AppConstants.PROVIDER_EXT_SOCKET:
 			dbConn = new Socket();
 			Log.i("ROUTE","Provider - Socket");
 			break;
-
+		
+		case AppConstants.PROVIDER_INT_SQLITE:
+			// TODO SQLITE dbConn = new Socket();
+			Log.i("ROUTE","Provider - SQLITE");
+			break;
+		
 		default:
+			// TODO default to SQLITE
 			// default to HTTP_APACHE
 			dbConn = new HTTP_Apache();
 			Log.i("ROUTE","Provider - defaulting to HTTP_Apache");
@@ -183,28 +230,29 @@ public class Route {
 			break;
 		}
 				
-		//this.routeID = routeID;
+		// initialize array lists
 		this.routeStepList = new ArrayList<RouteStep>();
 		this.nodeList = new ArrayList<Node>();
 		
+		// convert the start/end string IDs into Node objects
 		this.startNode = getNodeByID(startNodeID);
 		if (this.startNode == null) {
 			this.startNode = loadFloorNodeNeighborData(null, startNodeID);
 			//this.startNode = getNodeByID(startNodeID);
 		}
 		
+		Log.i("ROUTE","nodeList size - after load startNode: " + this.nodeList.size());
+		
 		this.endNode = getNodeByID(endNodeID);
 		if (this.endNode == null) {
 			this.endNode = loadFloorNodeNeighborData(null, endNodeID);
 			//this.endNode = getNodeByID(endNodeID);
 		}	
-
+		
+		Log.i("ROUTE","nodeList size - after load endNode: " + this.nodeList.size());
+		
 		return this;
 	}
-	
-//	public void setBlackboxOutput(JTextArea jta) {
-//		this.blackboxOutput = jta;
-//	}
 	
 	// setters and getters
 	public void setRouteID(String routeID) {
@@ -271,7 +319,8 @@ public class Route {
 //		if (index >= 0) return nodeList.get(index);
 		*/
 		
-		for (int i = 0; i < nodeList.size(); i++) {
+		int listSize = nodeList.size();
+		for (int i = 0; i < listSize; i++) {
 			if (nodeList.get(i).getNodeID().equals(nodeID)) {
 				return nodeList.get(i);	// match found
 			}
@@ -297,12 +346,15 @@ public class Route {
 	}
 	
 	public String getDatabaseProvider() {
-		switch (ExtDbConstants.DATABASE_PROVIDER) {
-		case ExtDbConstants.PROVIDER_HTTP_APACHE:
+		switch (AppConstants.DATABASE_PROVIDER) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			return "HTTP_Apache";
 		
-		case ExtDbConstants.PROVIDER_SOCKET:
+		case AppConstants.PROVIDER_EXT_SOCKET:
 			return "Socket";
+		
+		case AppConstants.PROVIDER_INT_SQLITE:
+			return "SQLITE";
 		
 		default:
 			return "unknown";
@@ -331,7 +383,7 @@ public class Route {
 	 * description:	1. gather and verify all required data
 	 * 				2. initialize Dijkstra algorithm
 	 * 				3. perform algorithm to find shortest path
-	 * 				   (using pseudo-code from 
+	 * 				   (based on pseudo-code from 
 	 * 				   http://renaud.waldura.com/doc/java/dijkstra/)
 	 * 				4. generate the RouteSteps in routeStepList
 	 * 				5. return result code
@@ -347,9 +399,12 @@ public class Route {
 			return 1;	// error - startNode, endNode, or nodeList == null
 		}
 		
-		System.out.println("\nstartNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
-		System.out.println("endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
-		System.out.println("nodeList.size() = " + nodeList.size());
+//		System.out.println("\nstartNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
+//		System.out.println("endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
+//		System.out.println("nodeList.size() = " + nodeList.size());
+		Log.i("ROUTE", "startNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
+		Log.i("ROUTE", "endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
+		Log.i("ROUTE", "nodeList.size() = " + nodeList.size());
 		
 		// verify startNode is NOT the same as endNode
 		if(startNode.getNodeID().equals(endNode.getNodeID())) {
@@ -385,39 +440,56 @@ public class Route {
 //			System.out.println("Node: " + iN.getNodeID() + "; shortestDist: " + iN.getShortestDist() + "; predecessor: " + iN.getPredecessor());
 //		}
 		
-		System.out.println("verbose: " + verbose);
-		System.out.println("stairsOrElevator: " + stairsOrElevator);
-		System.out.println("bIgnoreDeferredSetting: " + bIgnoreDeferredSetting);
-		System.out.println("Initialization done");
-
+//		System.out.println("verbose: " + verbose);
+//		System.out.println("stairsOrElevator: " + stairsOrElevator);
+//		System.out.println("bIgnoreDeferredSetting: " + bIgnoreDeferredSetting);
+//		System.out.println("Initialization done");
+		Log.i("ROUTE", "verbose: " + verbose);
+		Log.i("ROUTE", "stairsOrElevator: " + stairsOrElevator);
+		Log.i("ROUTE", "bIgnoreDeferredSetting: " + bIgnoreDeferredSetting);
+		Log.i("ROUTE", "Initialization done");
+		
+		/*
+		 * List of algorithm optimizations
+		 * 
+		 * OPTIMIZATION			description
+		 * endNode settled		algorithm loop will terminate when endNode has been settled
+		 * 						this prevents the algorithm from processing extra nodes
+		 * 
+		 */
+		
+		
+		
 		// perform algorithm to find shortest path
-		System.out.println("\n***Begin algorithm*** \n");
-		while ((unsettledBucket.size() != 0) && (!endNodeSettled)) {		// TODO ** endNode settled
+		//System.out.println("\n***Begin algorithm*** \n");
+		Log.i("ROUTE", "***Begin algorithm***");
+		while ((unsettledBucket.size() != 0) && (!endNodeSettled)) {	// OPTIMIZATION ** endNode settled
 			// 
-			System.out.print(".");
+			//System.out.print(".");
 			
 			myMetrics.getMetricsByID(routeID).addAlgorithmLoop();
 			
 			//System.out.println("Top of Loop");
 			currentNode = extractMinimum(currentNode);
 			settledBucket.add(currentNode);
+			
 			if (currentNode.getNodeID().equals(endNode.getNodeID())) {
-				//System.out.println("\nendNode has been settled");	// TODO ** endNode settled
-				endNodeSettled = true;
+				//System.out.println("\nendNode has been settled");	
+				endNodeSettled = true;	// OPTIMIZATION ** endNode settled
 			} else {
 				relaxNeighbors(currentNode);
 			}
-			// relaxNeighbors(currentNode);
 			
-			// if unsettledBucket is empty, and endNode is not settled, checked deferredBucket
-			// extract connector Node from deferredBucket with shortest distance
-			if ((unsettledBucket.size() == 0) && (!endNodeSettled)) {	// TODO ** stairs or elevator
+			// if unsettledBucket is empty, and endNode is not settled, check deferredBucket
+			// and extract connector Node with shortest distance
+			if ((unsettledBucket.size() == 0) && (!endNodeSettled)) {	// FEATURE ** stairs or elevator
 				unsettledBucket.add(extractMinimumDeferred());
 			}
 			
 		}
 		
-		System.out.println("\n----Out of algorithm loop--- \n \n");
+		//System.out.println("\n----Out of algorithm loop--- \n \n");
+		Log.i("ROUTE", "----Out of algorithm loop---");
 		
 		// for testing - print out contents of settledBucket to console
 		// test_printBuckets();
@@ -647,6 +719,7 @@ public class Route {
 							lastNode = fieldsList[0];
 						} else {
 							// we need to check to see if the connector node already exists in nodeList
+							// TODO Node connNode = getNodeByID(fieldsList[0]);
 							if (getNodeByID(fieldsList[0]) == null) {
 								//thisNode = new Node(fieldsList[0],fieldsList[2],fieldsList[5],fieldsList[6],Integer.parseInt(fieldsList[7]),fieldsList[4],fieldsList[8].equals("1"),fieldsList[9],fieldsList[10],Integer.parseInt(fieldsList[11]),Integer.parseInt(fieldsList[12]),fieldsList[13].equals("1"),fieldsList[14]);
 								nodesToBeAdded.add(thisNode);

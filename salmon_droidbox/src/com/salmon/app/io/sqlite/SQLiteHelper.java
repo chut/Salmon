@@ -2,6 +2,8 @@ package com.salmon.app.io.sqlite;
 
 import java.util.ArrayList;
 
+import com.salmon.app.io.DatabaseConstants;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,13 +15,13 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 	private ArrayList<String> tabledata;
 
 	public SQLiteHelper(Context context) {
-		super(context, SQLiteConstants.DATABASE_NAME, null, SQLiteConstants.DATABASE_VERSION);
+		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
 		
 		this.tabledata = null;
 	}
 
 	public SQLiteHelper(Context context, ArrayList<String> tabledata) {
-		super(context, SQLiteConstants.DATABASE_NAME, null, SQLiteConstants.DATABASE_VERSION);
+		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
 		
 		this.tabledata = tabledata;
 	}
@@ -33,8 +35,8 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		Log.i("SQLITE","onCreate database");
-		db.execSQL("DROP TABLE IF EXISTS " + SQLiteConstants.TABLE_NAME);
-		String sql = SQLiteConstants.CREATE_TABLE;
+		db.execSQL("DROP TABLE IF EXISTS " + DatabaseConstants.TABLE_NAME);
+		String sql = DatabaseConstants.CREATE_TABLE;
 		//db.setVersion((int) System.currentTimeMillis());
 		db.execSQL(sql);
 		ContentValues values = new ContentValues();
@@ -63,24 +65,24 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 				
 				//insert record row
 		        values.clear();
-		        values.put(SQLiteConstants.KEY_NODE_ID, fields[0]);
-		        values.put(SQLiteConstants.KEY_NODE_LABEL, fields[2]);
-		        values.put(SQLiteConstants.KEY_NODE_TYPE, fields[4]);
-		        values.put(SQLiteConstants.KEY_NODE_PHOTO, fields[10]);
-		        values.put(SQLiteConstants.KEY_NODE_X, Integer.parseInt(fields[11]));//
-		        values.put(SQLiteConstants.KEY_NODE_Y, Integer.parseInt(fields[12]));//
-		        values.put(SQLiteConstants.KEY_NODE_IS_CONNECTOR, Integer.parseInt(fields[8]));//
-		        values.put(SQLiteConstants.KEY_NODE_IS_POI, Integer.parseInt(fields[13]));//
-		        values.put(SQLiteConstants.KEY_NODE_POI_Img, fields[14]);
-		        values.put(SQLiteConstants.KEY_BUILDING_ID, fields[5]);
-		        values.put(SQLiteConstants.KEY_BUILDING_NAME, fields[15]);
-		        values.put(SQLiteConstants.KEY_FLOOR_ID, fields[6]);
-		        values.put(SQLiteConstants.KEY_FLOOR_LEVEL, Integer.parseInt(fields[7]));//
-		        values.put(SQLiteConstants.KEY_FLOOR_MAP, fields[9]);
-		        values.put(SQLiteConstants.KEY_NEIGHBOR_NODE, fields[1]);
-		        values.put(SQLiteConstants.KEY_NEIGHBOR_DISTANCE, Integer.parseInt(fields[3]));//
+		        values.put(DatabaseConstants.KEY_NODE_ID, fields[0]);
+		        values.put(DatabaseConstants.KEY_NODE_LABEL, fields[2]);
+		        values.put(DatabaseConstants.KEY_NODE_TYPE, fields[4]);
+		        values.put(DatabaseConstants.KEY_NODE_PHOTO, fields[10]);
+		        values.put(DatabaseConstants.KEY_NODE_X, Integer.parseInt(fields[11]));//
+		        values.put(DatabaseConstants.KEY_NODE_Y, Integer.parseInt(fields[12]));//
+		        values.put(DatabaseConstants.KEY_NODE_IS_CONNECTOR, Integer.parseInt(fields[8]));//
+		        values.put(DatabaseConstants.KEY_NODE_IS_POI, Integer.parseInt(fields[13]));//
+		        values.put(DatabaseConstants.KEY_NODE_POI_Img, fields[14]);
+		        values.put(DatabaseConstants.KEY_BUILDING_ID, fields[5]);
+		        values.put(DatabaseConstants.KEY_BUILDING_NAME, fields[15]);
+		        values.put(DatabaseConstants.KEY_FLOOR_ID, fields[6]);
+		        values.put(DatabaseConstants.KEY_FLOOR_LEVEL, Integer.parseInt(fields[7]));//
+		        values.put(DatabaseConstants.KEY_FLOOR_MAP, fields[9]);
+		        values.put(DatabaseConstants.KEY_NEIGHBOR_NODE, fields[1]);
+		        values.put(DatabaseConstants.KEY_NEIGHBOR_DISTANCE, Integer.parseInt(fields[3]));//
 		        
-		        db.insert(SQLiteConstants.TABLE_NAME, null, values);
+		        db.insert(DatabaseConstants.TABLE_NAME, null, values);
 			}
 		}
 		
@@ -93,7 +95,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 		newVersion++;	// always force an update
 		if (oldVersion >= newVersion) return;
 
-		db.execSQL("DROP TABLE IF EXISTS " + SQLiteConstants.TABLE_NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + DatabaseConstants.TABLE_NAME);
 		onCreate(db);
 	}
 

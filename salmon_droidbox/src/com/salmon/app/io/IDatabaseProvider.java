@@ -1,4 +1,4 @@
-package com.salmon.app.io.extdb;
+package com.salmon.app.io;
 
 import java.util.ArrayList;
 

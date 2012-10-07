@@ -2,7 +2,7 @@ package com.salmon.activities;
 
 import com.salmon.app.AppConstants;
 import com.salmon.app.io.AppIO;
-import com.salmon.app.io.sqlite.SQLiteConstants;
+import com.salmon.app.io.DatabaseConstants;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -83,7 +83,9 @@ public final class AppOptionsMenu {
 			activity.moveTaskToBack(true);
 			return true;
 		case SYNC:
-			appIO.sqlite_async_getData(SQLiteConstants.QUERY_SYNC_DB, SQLiteConstants.PROGRESS_DIALOG, null, null, activity);
+			//TODO fix this
+			//appIO.updateTextView_sqlite_async(DatabaseConstants.QUERY_SYNC_DB, AppConstants.PROGRESS_DIALOG, null, activity);
+			appIO.syncDatabase_async(AppConstants.PROGRESS_DIALOG, activity);
 			return true;
 		case INFO:
 			
