@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 public final class AppPrefs {
 	public static final String PREFERENCE_MAP_MODE = "mode";
+	public static final String PREFERENCE_ALGORITHM_DATABASE_PROVIDER = "algo_db_prov";
 		
 	// preferences for map route
 	public static final String PREFERENCE_START_ID = "startid";
@@ -56,6 +57,18 @@ public final class AppPrefs {
 		prefs = PreferenceManager.getDefaultSharedPreferences(context); 
 		editor = prefs.edit(); 
 		editor.putString(PREFERENCE_MAP_MODE, mode);
+		editor.commit();
+	}
+	
+	public static String getAlogrithmDatabaseProvider(Context context) {
+		prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString(PREFERENCE_ALGORITHM_DATABASE_PROVIDER, "3");
+	}
+
+	public static void setAlogrithmDatabaseProvider(int provider, Context context) {
+		prefs = PreferenceManager.getDefaultSharedPreferences(context); 
+		editor = prefs.edit(); 
+		editor.putString(PREFERENCE_ALGORITHM_DATABASE_PROVIDER, "" + provider + "");
 		editor.commit();
 	}
 	

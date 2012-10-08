@@ -30,7 +30,7 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 		this.params = params;
 		
 		// setup database connection provider
-		switch (AppConstants.DATABASE_PROVIDER) {
+		switch (AppConstants.DATABASE_PROVIDER_UI) {
 		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			break;

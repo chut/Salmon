@@ -159,7 +159,18 @@ public class AppPreferencesActivity extends PreferenceActivity {
 	        colorExitPOI.setDefaultValue("exit_orange.png");
 	        screenPOIcolor.addPreference(colorExitPOI);
 		     
-        // Verbose 
+	    // Algorithm Database Provider 
+        ListPreference providerPref = new ListPreference(this);
+        providerPref.setEntries(new CharSequence[] {"HTTP_Apache","SQLite"});
+        providerPref.setEntryValues(new CharSequence[] {"1","3"});
+        providerPref.setDialogTitle("Algorithm Database Provider");
+        providerPref.setKey(AppPrefs.PREFERENCE_ALGORITHM_DATABASE_PROVIDER);
+        providerPref.setTitle("Database Provider");
+        providerPref.setSummary("What database provider does the algorithm use?");
+        providerPref.setDefaultValue("3");
+        AppPrefCat.addPreference(providerPref);
+	        
+	    // Verbose 
         CheckBoxPreference verbosePref = new CheckBoxPreference(this);
         verbosePref.setKey(AppPrefs.PREFERENCE_VERBOSE);
         verbosePref.setTitle("Verbose");

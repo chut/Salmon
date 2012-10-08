@@ -19,14 +19,13 @@ public final class AppConstants {
 	public static final int PROVIDER_EXT_HTTP_APACHE = 1;	
 	public static final int PROVIDER_EXT_SOCKET = 2;
 	public static final int PROVIDER_INT_SQLITE = 3;
-	public static final int DATABASE_PROVIDER = PROVIDER_EXT_HTTP_APACHE;	// this is where we set which database we will use (all functions)
-	
-	public static final int DATABASE_PROVIDER_ALGORITHM = PROVIDER_EXT_HTTP_APACHE;	// future use: this is where we set which database the algorithm will use
-	public static final int DATABASE_PROVIDER_UI = PROVIDER_INT_SQLITE;				// future use: this is where we set which database UI functions will use
+	public static final int DATABASE_PROVIDER_ALGORITHM = PROVIDER_INT_SQLITE;	// this is where we set which database the algorithm will use
+	public static final int DATABASE_PROVIDER_UI = PROVIDER_INT_SQLITE;				// this is where we set which database UI functions will use
 		
 	// progress options
 	public static final int PROGRESS_NONE = 0;
 	public static final int PROGRESS_BAR = 1;
 	public static final int PROGRESS_BAR_INDETERMINATE = 2;
 	public static final int PROGRESS_DIALOG = 3;
+	
 }

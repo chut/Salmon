@@ -81,19 +81,21 @@ public class FirstActivity extends ListActivity implements OnClickListener {
         
         appIO = new AppIO(AsyncConstants.DEFAULT_THREAD_POOL_SIZE);
         
-        r2 = new Route();
+        r2 = new Route(this);
         //async.handleRetainedTask(getLastNonConfigurationInstance());
         
     	resultsText.setText("Blackbox started at " + new Date() + "\n");
-        resultsText.append("Database Provider: " + r2.getDatabaseProvider() + "\n");
+    	resultsText.append("UI Database Provider: " + appIO.getUIDatabaseProviderName() + "\n");
+        //resultsText.append("Algorithm Database Provider: " + r2.getDatabaseProvider() + "\n");
 	}
 
 	public void onClick(View button) {
 		// close the keyboard
 		InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); 
         in.hideSoftInputFromWindow(startEdit.getApplicationWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS); 
-        resultsText.setText("Calculate Route started at " + new Date() + '\n');        
-        resultsText.append("Database Provider: " + r2.getDatabaseProvider() + "\n");
+        resultsText.setText("Calculate Route started at " + new Date() + '\n'); 
+        resultsText.append("UI Database Provider: " + appIO.getUIDatabaseProviderName() + "\n");
+        resultsText.append("Algorithm Database Provider: " + r2.getDatabaseProvider() + "\n");
         
         //save prefs
         AppPrefs.setStartID(startEdit.getText().toString(), this);
@@ -248,6 +250,8 @@ public class FirstActivity extends ListActivity implements OnClickListener {
 		endEdit.setText(AppPrefs.getEndID(this));
 		verboseChk.setChecked(AppPrefs.getVerbose(this));
 		elevatorChk.setChecked(AppPrefs.getStairs(this).equals("elevator"));
+		r2.setDatabaseProvider(Integer.parseInt(AppPrefs.getAlogrithmDatabaseProvider(this)));
+		resultsText.append("Algorithm Database Provider: " + r2.getDatabaseProvider() + "\n");
 	}
 	
 	@Override

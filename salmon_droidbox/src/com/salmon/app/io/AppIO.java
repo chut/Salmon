@@ -43,48 +43,7 @@ private final UIHandler handlerUI;
 
 		return 0;
 	}
-	
-	// external database
-//	public void extDb_async_getData(boolean bProgressDialog, int queryType, String ... params) {
-//		Log.i("ROUTE", "extDb_async_getData");
-//		setupAsyncTask(new ExtDatabaseTask(activity.getResources(), queryType, params), bProgressDialog);
-//	}
-	
-//	public ArrayList<String> extDb_getData(int queryType, String ... params) {
-//		return ((ExtDatabaseTask) setupTask(new ExtDatabaseTask(activity.getResources(), queryType, params))).doInThisThread();
-//		//onComplete();
-//	}
-	
-	// SQLite
-//	public void sqlite_async_getData(int querytype, int progress, E1 element1, E2 element2, Activity mActivity, String ... params) {
-//		// create task
-//		Task_SQLiteIO<String, String> sqliteTask = new Task_SQLiteIO<String, String>(mActivity, handlerUI, querytype, params, element1, element2);
-//		
-//		// attach progress bar/dialog
-//		switch (progress) {
-//		case SQLiteConstants.PROGRESS_BAR:
-//			// app is not using progress bars 
-//			break;
-//		case SQLiteConstants.PROGRESS_BAR_INDETERMINATE:
-//			sqliteTask.addIndeterminateProgressBar(mActivity);
-//			break;
-//		case SQLiteConstants.PROGRESS_DIALOG:
-//			sqliteTask.addProgressDialog(mActivity, null, "Working, please wait...");
-//			break;
-//
-//		default:
-//			// do nothing - no progress bar/dialog
-//			break;
-//		}
-//		
-//		// submit task
-//		Future<ArrayList<String>> future = this.executorService.submit(sqliteTask);
-//				
-//		// enable task canceling
-//		sqliteTask.initOnCancelListener(future);
-//
-//	}
-	
+		
 	public void syncDatabase_async(int progressBar, Activity activity) {
 		// create task
 		Task_DatabaseIO<String, Context> databaseTask = new Task_DatabaseIO<String, Context>(activity, handlerUI, DatabaseConstants.QUERY_SYNC_DB, null, AppConstants.PROVIDER_INT_SQLITE);
@@ -122,7 +81,7 @@ private final UIHandler handlerUI;
 	public void updateTextView_sqlite_async(int querytype, int progressBar, TextView element1, Activity activity, String ... params) {
 		// create task
 		//Task_SQLiteIO<TextView, String> sqliteTask = new Task_SQLiteIO<TextView, String>(activity, handlerUI, querytype, params, element1, null);
-		Task_DatabaseIO<TextView, String> sqliteTask = new Task_DatabaseIO<TextView, String>(activity, handlerUI, querytype, params, AppConstants.PROVIDER_INT_SQLITE);
+		Task_DatabaseIO<TextView, String> sqliteTask = new Task_DatabaseIO<TextView, String>(activity, handlerUI, querytype, params);
 		
 		// attach progress bar/dialog
 		switch (progressBar) {
@@ -156,7 +115,7 @@ private final UIHandler handlerUI;
 	public void updateListView_sqlite_async(int querytype, int progressBar, ArrayList<String> element1, ArrayAdapter<String> element2, Activity activity, String ... params) {
 		// create task
 		//Task_SQLiteIO<ArrayList<String>, ArrayAdapter<String>> sqliteTask = new Task_SQLiteIO<ArrayList<String>, ArrayAdapter<String>>(activity, handlerUI, querytype, params, element1, element2);
-		Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>> sqliteTask = new Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>>(activity, handlerUI, querytype, params, AppConstants.PROVIDER_INT_SQLITE);
+		Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>> sqliteTask = new Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>>(activity, handlerUI, querytype, params);
 		
 		// attach progress bar/dialog
 		switch (progressBar) {
@@ -176,7 +135,7 @@ private final UIHandler handlerUI;
 		}
 		
 		// create and set resultTask
-		Post_UpdateListView resultTask = new Post_UpdateListView(element1, element2);
+		Post_UpdateList resultTask = new Post_UpdateList(element1, element2);
 		sqliteTask.setResultTask(resultTask);
 		
 		// submit task
@@ -187,9 +146,23 @@ private final UIHandler handlerUI;
 
 	}
 	
-//	public void sqlite_getData(int queryType, String ... params) {
-//		((SQLiteTask) setupTask(new SQLiteTask(activity, queryType, params))).doInThisThread();
-//	}
+	public final String getUIDatabaseProviderName() {
+		switch (AppConstants.DATABASE_PROVIDER_UI) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
+			return "HTTP_Apache";
+						
+		case AppConstants.PROVIDER_EXT_SOCKET:
+			return "Socket";
+			
+		case AppConstants.PROVIDER_INT_SQLITE:
+			return "SQLITE";
+			
+		default:
+			return "unknown";
+			
+		}
+		
+	}
 	
 	private class Post_UpdateTextView extends PostRunnableBase<TextView, String> {
 		
@@ -221,9 +194,9 @@ private final UIHandler handlerUI;
 		}
 	}
 
-	private class Post_UpdateListView extends PostRunnableBase<ArrayList<String>, ArrayAdapter<String>> {
+	private class Post_UpdateList extends PostRunnableBase<ArrayList<String>, ArrayAdapter<String>> {
 		
-		public Post_UpdateListView(ArrayList<String> element1, ArrayAdapter<String> element2) {
+		public Post_UpdateList(ArrayList<String> element1, ArrayAdapter<String> element2) {
 			super(element1, element2);
 		}
 

@@ -28,6 +28,7 @@ public class SQLite implements IDatabaseProvider {
 	}
 	
 	public ArrayList<String> getDataFromDatabase(int queryType,	String[] params) {
+		Log.i("SQLITE","getDataFromDatabase - begin");
 		final ArrayList<String> results = new ArrayList<String>();
 		this.params = params;
 		
@@ -61,6 +62,10 @@ public class SQLite implements IDatabaseProvider {
 			
 		case DatabaseConstants.QUERY_DISPLAY_ALLDATA:
 			results.addAll(query_DisplayAllData());
+			break;
+	    
+		case DatabaseConstants.QUERY_NEIGHBORS:
+			results.addAll(query_Neighbors());
 			break;
 	    
 		default:
@@ -350,4 +355,109 @@ public class SQLite implements IDatabaseProvider {
 		return results;
 	}
 	
+	private ArrayList<String> query_Neighbors() {
+		Log.i("SQLITE", "query_Neighbors - begin");
+		
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		final ArrayList<String> results = new ArrayList<String>();
+		String strSQL = null;
+		
+		Log.i("SQLITE","Params.length:" + params.length);
+		// construct SQL statements
+		if (params.length == 1) {
+			// nodeID (params[0]) was passed.  base SQL off nodeID
+			Log.i("SQLITE","base SQL off nodeID: " + params[0]);
+			strSQL = ""
+				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME 
+				+ " WHERE " 
+					+ DatabaseConstants.KEY_BUILDING_ID + " IN "
+						+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
+					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+						+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") " 
+				+ "UNION ALL " 
+				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+				+ " WHERE "
+					+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " IN "
+									+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME
+										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
+								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+									+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME
+										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\")) "
+				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+			
+		} else {
+			// buildingID (params[0]) and floorID (params[1]) were passed.  base SQL off of those.
+			Log.i("SQLITE","base SQL off buildingID and floorID: " + params[0] + ", " + params[1]);
+			strSQL = ""
+				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+				+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
+					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\" " 
+				+ " UNION ALL "
+				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+				+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
+								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\") "
+				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+		}
+		
+		//Log.i("SQLITE","SQL: " + strSQL);
+		
+		// open the SQLite database
+		try {
+			db = sqliteHelper.getWritableDatabase();
+        } catch(SQLException e) { 
+        	// TODO error handling
+        	if (db != null) {db.close();}
+        	results.add(DatabaseConstants.RESULT_FAILED);
+        	return results;
+        }
+		
+		// obtain data from sqlite database
+		cursor = db.rawQuery(strSQL, null);
+        
+        // create a comma delimited ArrayList<String> from cursor results
+		//if (this.future == null || !this.future.isCancelled()) {
+			while (cursor.moveToNext()) {
+	        	results.add(""
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID)) + "," 
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL)) + "," 
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE)) + "," 
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img)) + ","
+	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME)));
+			}
+		//}
+		
+		// close the database connection, and return results
+		if (cursor != null) {cursor.close();}
+		if (db != null) {db.close();}
+		
+//		if (this.future == null || !this.future.isCancelled()) {
+			Log.i("SQLITE","AllData - results.size: " + results.size());
+			return results;
+//		} else {
+//			return null;
+//		}
+
+	}
 }

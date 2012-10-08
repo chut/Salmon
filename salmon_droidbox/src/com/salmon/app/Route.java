@@ -7,11 +7,15 @@ import java.util.ListIterator;
 
 //import javax.swing.JTextArea;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.salmon.activities.AppPrefs;
+import com.salmon.app.io.DatabaseConstants;
 import com.salmon.app.io.IDatabaseProvider;
 import com.salmon.app.io.extdb.HTTP_Apache;
 import com.salmon.app.io.extdb.Socket;
+import com.salmon.app.io.sqlite.SQLite;
 import com.metrics.MetricGroup;
 
 /**********************************************************
@@ -27,6 +31,7 @@ import com.metrics.MetricGroup;
 public class Route {
 
 	// fields
+	private final Context context;
 	private String routeID;
 	private ArrayList<RouteStep> routeStepList;
 	private ArrayList<Node> nodeList;
@@ -60,12 +65,14 @@ public class Route {
 	 * modified:	
 	 * @return 
 	 *********************************************************/
-	public Route(String routeID, Node startNode, Node endNode) {
+	public Route(Context context, String routeID, Node startNode, Node endNode) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		
+		this.context = context;
+		
 		// setup database connection provider
-		switch (AppConstants.DATABASE_PROVIDER) {
+		switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
 		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			break;
@@ -75,13 +82,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			// TODO SQLITE dbConn = new Socket();
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
-			// TODO default to SQLITE
-			//dbConn = new HTTP_Apache();
-			
+			// default to SQLITE
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - defaulting to SQLITE");
+									
 			break;
 		}
 				
@@ -107,13 +116,15 @@ public class Route {
 	 * creator:		Ken Richards
 	 * modified:	
 	 *********************************************************/
-	public Route(String routeID, String startNodeID, String endNodeID, String ... settings) {
+	public Route(Context context, String routeID, String startNodeID, String endNodeID, String ... settings) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		myMetrics.setDbaseProvider(getDatabaseProvider());
 		
+		this.context = context;
+		
 		// setup database connection provider
-		switch (AppConstants.DATABASE_PROVIDER) {
+		switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
 		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			break;
@@ -123,12 +134,14 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			// TODO SQLITE dbConn = new Socket();
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
-			// TODO default to SQLITE
-			//dbConn = new HTTP_Apache();
+			// default to SQLITE
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
 		}
@@ -173,8 +186,9 @@ public class Route {
 	 * creator:		Ken Richards
 	 * modified:	
 	 *********************************************************/
-	public Route() {
+	public Route(Context context) {
 		// intentionally left blank.  intention is to only create object.  use setup() and initialize() to complete object setup
+		this.context = context;
 	}
 	
 	// this is a low cost method, meant to be run from the GUI thread
@@ -203,9 +217,8 @@ public class Route {
 		myMetrics.setDbaseProvider(getDatabaseProvider());
 		
 		// setup database connection provider
-		// TODO change this to AppConstants
-		// TODO create option for PROVIDER_SQLITE
-		switch (AppConstants.DATABASE_PROVIDER) {
+		//switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
+		switch (Integer.parseInt(AppPrefs.getAlogrithmDatabaseProvider(context))) {
 		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
 			dbConn = new HTTP_Apache();
 			Log.i("ROUTE","Provider - HTTP_Apache");
@@ -217,16 +230,15 @@ public class Route {
 			break;
 		
 		case AppConstants.PROVIDER_INT_SQLITE:
-			// TODO SQLITE dbConn = new Socket();
+			dbConn = new SQLite(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
-			// TODO default to SQLITE
-			// default to HTTP_APACHE
-			dbConn = new HTTP_Apache();
-			Log.i("ROUTE","Provider - defaulting to HTTP_Apache");
-			
+			// default to SQLITE
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - defaulting to SQLITE");
+						
 			break;
 		}
 				
@@ -242,6 +254,7 @@ public class Route {
 		}
 		
 		Log.i("ROUTE","nodeList size - after load startNode: " + this.nodeList.size());
+		//logNodeList();
 		
 		this.endNode = getNodeByID(endNodeID);
 		if (this.endNode == null) {
@@ -250,6 +263,7 @@ public class Route {
 		}	
 		
 		Log.i("ROUTE","nodeList size - after load endNode: " + this.nodeList.size());
+		//logNodeList();
 		
 		return this;
 	}
@@ -346,22 +360,49 @@ public class Route {
 	}
 	
 	public String getDatabaseProvider() {
-		switch (AppConstants.DATABASE_PROVIDER) {
-		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
-			return "HTTP_Apache";
-		
-		case AppConstants.PROVIDER_EXT_SOCKET:
-			return "Socket";
-		
-		case AppConstants.PROVIDER_INT_SQLITE:
-			return "SQLITE";
-		
-		default:
-			return "unknown";
-		}
+		return dbConn.getClass().getSimpleName();
+//		switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
+//		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
+//			
+//			return "HTTP_Apache";
+//		
+//		case AppConstants.PROVIDER_EXT_SOCKET:
+//			return "Socket";
+//		
+//		case AppConstants.PROVIDER_INT_SQLITE:
+//			return "SQLITE";
+//		
+//		default:
+//			return "unknown";
+//		}
 		//return IDatabaseProvider.class.getCanonicalName();
 	}
+	
+	public void setDatabaseProvider(int provider) {
+		// setup database connection provider
+		switch (provider) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
+			dbConn = new HTTP_Apache();
+			break;
 		
+		case AppConstants.PROVIDER_EXT_SOCKET:
+			dbConn = new Socket();
+			break;
+			
+		case AppConstants.PROVIDER_INT_SQLITE:
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - SQLITE");
+			break;
+		
+		default:
+			// default to SQLITE
+			dbConn = new SQLite(context);
+			Log.i("ROUTE","Provider - defaulting to SQLITE");
+			
+			break;
+		}
+	}
+	
 	public MetricGroup getMyMetrics() {
 		return myMetrics;
 	}
@@ -646,8 +687,9 @@ public class Route {
 	 * 					same floor as myNode (it used to only load Neighbors of myNode)
 	 *********************************************************/
 	public Node loadFloorNodeNeighborData(Node myNode, String ... myNodeID) {
+		Log.i("ROUTE","loadFloorNodeNeighborData - begin");
 		// initialize local variables
-		final int NEIGHBORS = 1;
+		final int NEIGHBORS = DatabaseConstants.QUERY_NEIGHBORS;
 		ArrayList<String> myResultsList = new ArrayList<String>();
 		ArrayList<Node> nodesToBeAdded = new ArrayList<Node>();
 		ArrayList<NodeNeighborMap> nodeNeighborList = new ArrayList<NodeNeighborMap>();
@@ -664,11 +706,13 @@ public class Route {
 		if (myNode == null) {
 			if(myNodeID.length > 1) {
 				// buildingID (myNodID[0]) and floorID (myNodeID[1]) were passed as strings
+				Log.i("ROUTE","get data by buildingID and floorID");
 				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
 				
 			} else {
 				// only the nodeID was passed - myNodeID[0]
 				//blackboxOutput.append("database call for: " + myNodeID[0] + "\n");
+				Log.i("ROUTE","get data by nodeID");
 				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
 			}
 		} else {
@@ -679,6 +723,7 @@ public class Route {
 			myNodeID[1] = myNode.getFloorID();
 			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
 		}
+		Log.i("ROUTE","nodes obtained from database - next, load into java");
 		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 		
 		if (myResultsList != null) {
@@ -690,8 +735,8 @@ public class Route {
 				for (int i = 0; i < myResultsList.size(); i++) {
 					// resultRow = neighborNode, nodeID, nodeLabel, distance, typeName, buildingID, floorID, flooeLevel, isConnector, mapImg, photoImg, x, y, isPOI, poiIconImg
 					fieldsList = myResultsList.get(i).split(",");
-					// fieldsList[0] = neighborNode	(nodeID of neighbor Node)
-					// fieldsList[1] = nodeID  		(this should = myNode.getNodeID)
+					// fieldsList[0] = neighborNode	(nodeID of neighbor Node) - Note: this will be the ID of the Node object we load
+					// fieldsList[1] = nodeID  		(this should = myNode.getNodeID) - Note: this will be the ID of the Neighbor
 					// fieldsList[2] = nodeLabel	(nodeLabel of neighbor Node)
 					// fieldsList[3] = distance		(distance value for Neighbor)
 					// fieldsList[4] = typeName		(type of Node)
@@ -708,7 +753,7 @@ public class Route {
 					
 					// since resultList is sorted (SQL-side ORDER BY), we can skip duplicate Nodes
 					if (!lastNode.equals(fieldsList[0])) {
-						// create the node to be added
+						// create the node to be added (note: nodeID is fieldList[0], NOT fieldList[1].  This is because the query results treat the neighbor as the full node object, and the nodeID as the ID of the neighbor (backwards, ya I know)
 						// nodeID, nodeLabel, buildingID, floorID, floorLevel, nodeType, isConnector, mapImg, photoImg, xCoordinate, yCoordinate, isPOI, poiIconImg
 						thisNode = new Node(fieldsList[0],fieldsList[2],fieldsList[5],fieldsList[6],Integer.parseInt(fieldsList[7]),fieldsList[4],fieldsList[8].equals("1"),fieldsList[9],fieldsList[10],Integer.parseInt(fieldsList[11]),Integer.parseInt(fieldsList[12]),fieldsList[13].equals("1"),fieldsList[14]);
 						
@@ -1657,6 +1702,22 @@ public class Route {
 		
 		return printout;
 	}
+	
+	private void logNodeList() {
+		String string;
+		Log.i("ROUTE","*****nodeList.size: " + nodeList.size());
+		for (Node node : nodeList) {
+			string = ""
+					+ "node: " + node.getNodeID() + ", "
+					+ "label: " + node.getNodeLabel() + ", "
+					+ "bldg: " + node.getBuildingID() + ", "
+					+ "flr: " + node.getFloorID() + ", "
+					+ "isConn: " + node.getIsConnector();
+			Log.i("ROUTE",string);
+		}
+		Log.i("ROUTE","************");
+	}
+	
 	//inner class
 	public class NodeNeighborMap {
 		Node node;
