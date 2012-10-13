@@ -2,7 +2,7 @@ package com.salmon.app.io;
 
 public class DatabaseConstants {
 	// External Database Constants
-	public static final String BASE_URL = "http://wayfinder.mapsdb.com/cs460spr2012dev/DBservlet";
+	public static final String BASE_URL = "http://wayfinder.mapsdb.com/cs401fall2012/DBservlet2";
 	public static final int BUFFERSIZE = 1000;
 	
 	// Internal (SQLite) Constants
