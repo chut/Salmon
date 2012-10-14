@@ -83,6 +83,50 @@ public class DatabaseConstants {
 	public static final String RESULT_SUCCESS = "success";
 	public static final String RESULT_FAILED = "failed";
 	
-			
-			
+	public static final String SQL_NODEID_1 = ""	
+			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME 
+			+ " WHERE " 
+				+ DatabaseConstants.KEY_BUILDING_ID + " IN "
+					+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+						+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; //+ nodeID +		 
+	public static final String SQL_NODEID_2	= "\") "
+				+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+					+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+						+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; //+ nodeID + 
+	public static final String SQL_NODEID_3	= "\") " 
+			+ "UNION ALL " 
+			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ " WHERE "
+				+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+				+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+					+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+						+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+							+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " IN "
+								+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME
+									+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; //+ nodeID + 
+	public static final String SQL_NODEID_4	= "\") "
+							+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+								+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME
+									+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; // + nodeID + 
+	public static final String SQL_NODEID_5	= "\")) "
+			+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+	
+	public static final String SQL_BLDFLR_1	= ""
+			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \""; //+ buildingID + 
+	public static final String SQL_BLDFLR_2	= "\" "
+				+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \""; //+ floorID + 
+	public static final String SQL_BLDFLR_3	= "\" " 
+			+ " UNION ALL "
+			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+				+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+					+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+						+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+							+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " = \""; //+ buildingID + 
+	public static final String SQL_BLDFLR_4	= "\" "
+							+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \""; //+ floorID + 
+	public static final String SQL_BLDFLR_5	= "\") "
+			+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+		
 }

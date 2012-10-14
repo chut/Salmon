@@ -365,52 +365,73 @@ public class SQLite implements IDatabaseProvider {
 		
 		Log.i("SQLITE","Params.length:" + params.length);
 		// construct SQL statements
+		StringBuilder sbSQL = new StringBuilder(512);
 		if (params.length == 1) {
 			// nodeID (params[0]) was passed.  base SQL off nodeID
 			Log.i("SQLITE","base SQL off nodeID: " + params[0]);
-			strSQL = ""
-				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME 
-				+ " WHERE " 
-					+ DatabaseConstants.KEY_BUILDING_ID + " IN "
-						+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME 
-							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
-					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
-						+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME 
-							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") " 
-				+ "UNION ALL " 
-				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
-				+ " WHERE "
-					+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
-					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
-						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
-							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
-								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " IN "
-									+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME
-										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
-								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
-									+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME
-										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\")) "
-				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+			sbSQL.append(DatabaseConstants.SQL_NODEID_1);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_NODEID_2);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_NODEID_3);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_NODEID_4);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_NODEID_5);
+//			strSQL = ""
+//				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME 
+//				+ " WHERE " 
+//					+ DatabaseConstants.KEY_BUILDING_ID + " IN "
+//						+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+//							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
+//					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+//						+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME 
+//							+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") " 
+//				+ "UNION ALL " 
+//				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+//				+ " WHERE "
+//					+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+//					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+//						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+//							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+//								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " IN "
+//									+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME
+//										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\") "
+//								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " IN "
+//									+ "(SELECT " + DatabaseConstants.KEY_FLOOR_ID + " FROM " + DatabaseConstants.TABLE_NAME
+//										+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \"" + params[0] + "\")) "
+//				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
 			
 		} else {
 			// buildingID (params[0]) and floorID (params[1]) were passed.  base SQL off of those.
 			Log.i("SQLITE","base SQL off buildingID and floorID: " + params[0] + ", " + params[1]);
-			strSQL = ""
-				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
-				+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
-					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\" " 
-				+ " UNION ALL "
-				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
-				+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
-					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
-						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
-							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
-								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
-								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\") "
-				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
+			sbSQL.append(DatabaseConstants.SQL_BLDFLR_1);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_BLDFLR_2);
+			sbSQL.append(params[1]);
+			sbSQL.append(DatabaseConstants.SQL_BLDFLR_3);
+			sbSQL.append(params[0]);
+			sbSQL.append(DatabaseConstants.SQL_BLDFLR_4);
+			sbSQL.append(params[1]);
+			sbSQL.append(DatabaseConstants.SQL_BLDFLR_5);
+//			strSQL = ""
+//				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+//				+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
+//					+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\" " 
+//				+ " UNION ALL "
+//				+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+//				+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+//					+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
+//						+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
+//							+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
+//								+ "AND " + DatabaseConstants.KEY_BUILDING_ID + " = \"" + params[0] + "\" "
+//								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\") "
+//				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
 		}
 		
 		//Log.i("SQLITE","SQL: " + strSQL);
+		//Log.i("SQLITE","strSQL.length: " + strSQL.length());
+		
 		
 		// open the SQLite database
 		try {
@@ -423,28 +444,32 @@ public class SQLite implements IDatabaseProvider {
         }
 		
 		// obtain data from sqlite database
-		cursor = db.rawQuery(strSQL, null);
+		cursor = db.rawQuery(sbSQL.toString(), null);
         
+		StringBuilder sbRow; 
+		
         // create a comma delimited ArrayList<String> from cursor results
 		//if (this.future == null || !this.future.isCancelled()) {
 			while (cursor.moveToNext()) {
-	        	results.add(""
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID)) + "," 
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL)) + "," 
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE)) + "," 
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img)) + ","
-	        			+ cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME)));
+				sbRow = new StringBuilder(128);
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID))).append(","); 
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE))).append(","); 
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img))).append(",");
+	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME)));
+	        	results.add(sbRow.toString());
+	        	sbRow = null;
 			}
 		//}
 		

@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.salmon.app.AppConstants;
 import com.salmon.app.Route;
-import com.salmon.app.RouteTask;
 import com.salmon.app.async_core.PostRunnableBase;
 import com.salmon.app.async_core.ThreadManagerBase;
 import com.salmon.app.async_core.UIHandler;
@@ -30,7 +29,7 @@ private final UIHandler handlerUI;
 	// calculate route
 	public int calculateRoute(Context context, Route route, TextView textview) {
 		// create task
-		RouteTask<String, String> routeTask = new RouteTask<String, String>(context, handlerUI, route, textview);
+		Task_Route<String, String> routeTask = new Task_Route<String, String>(context, handlerUI, route, textview);
 		
 		// attach progress dialog
 		routeTask.addProgressDialog(context, null, "Working, please wait...");	// TODO refactor this to use @String
@@ -78,7 +77,7 @@ private final UIHandler handlerUI;
 		
 	}
 	
-	public void updateTextView_sqlite_async(int querytype, int progressBar, TextView element1, Activity activity, String ... params) {
+	public void updateTextView_async(int querytype, int progressBar, TextView element1, Activity activity, String ... params) {
 		// create task
 		//Task_SQLiteIO<TextView, String> sqliteTask = new Task_SQLiteIO<TextView, String>(activity, handlerUI, querytype, params, element1, null);
 		Task_DatabaseIO<TextView, String> sqliteTask = new Task_DatabaseIO<TextView, String>(activity, handlerUI, querytype, params);
@@ -112,7 +111,7 @@ private final UIHandler handlerUI;
 
 	}
 	
-	public void updateListView_sqlite_async(int querytype, int progressBar, ArrayList<String> element1, ArrayAdapter<String> element2, Activity activity, String ... params) {
+	public void updateListView_async(int querytype, int progressBar, ArrayList<String> element1, ArrayAdapter<String> element2, Activity activity, String ... params) {
 		// create task
 		//Task_SQLiteIO<ArrayList<String>, ArrayAdapter<String>> sqliteTask = new Task_SQLiteIO<ArrayList<String>, ArrayAdapter<String>>(activity, handlerUI, querytype, params, element1, element2);
 		Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>> sqliteTask = new Task_DatabaseIO<ArrayList<String>, ArrayAdapter<String>>(activity, handlerUI, querytype, params);

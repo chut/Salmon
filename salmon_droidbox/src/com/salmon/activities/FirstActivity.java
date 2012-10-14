@@ -159,37 +159,37 @@ public class FirstActivity extends ListActivity implements OnClickListener {
 			resultsText.append("All Data button - i.e. syncing with SQLite" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_DISPLAY_ALLDATA, SQLiteConstants.PROGRESS_DIALOG, resultsText, null, this);
-			appIO.updateTextView_sqlite_async(DatabaseConstants.QUERY_DISPLAY_ALLDATA, AppConstants.PROGRESS_DIALOG, resultsText, this);
+			appIO.updateTextView_async(DatabaseConstants.QUERY_DISPLAY_ALLDATA, AppConstants.PROGRESS_DIALOG, resultsText, this);
 			break;
 		case R.id.async_btn:
 			resultsText.append("Async button - sqlite call - Async w/indeterminate" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_ALLDATA, SQLiteConstants.PROGRESS_BAR_INDETERMINATE, resultsText, null, this);
-			appIO.updateTextView_sqlite_async(DatabaseConstants.QUERY_ALLDATA, AppConstants.PROGRESS_BAR_INDETERMINATE, resultsText, this);
+			appIO.updateTextView_async(DatabaseConstants.QUERY_ALLDATA, AppConstants.PROGRESS_BAR_INDETERMINATE, resultsText, this);
 			break;
 		case R.id.noAsync_btn:
 			resultsText.append("Async2 button - sqlite call - no progress" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_ALLDATA, SQLiteConstants.PROGRESS_NONE, resultsText, null, this);
-			appIO.updateTextView_sqlite_async(DatabaseConstants.QUERY_ALLDATA, AppConstants.PROGRESS_NONE, resultsText, this);
+			appIO.updateTextView_async(DatabaseConstants.QUERY_ALLDATA, AppConstants.PROGRESS_NONE, resultsText, this);
 			break;
 		case R.id.four_btn:
 			resultsText.append("All Nodes button - sqlite - lists all nodes in a Bldg (e.g. wang)" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_NODES_ALL, SQLiteConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wang");
-			appIO.updateListView_sqlite_async(DatabaseConstants.QUERY_NODES_ALL, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wang");
+			appIO.updateListView_async(DatabaseConstants.QUERY_NODES_ALL, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wang");
 			break;
 		case R.id.five_btn:
 			resultsText.append("By Floor button - sqlite - all 1st floor nodes (e.g. wang 2nd floor)" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_NODES_BY_FLOOR, SQLiteConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wa2", "wang");
-			appIO.updateListView_sqlite_async(DatabaseConstants.QUERY_NODES_BY_FLOOR, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wa2", "wang");
+			appIO.updateListView_async(DatabaseConstants.QUERY_NODES_BY_FLOOR, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "wa2", "wang");
 			break;
 		case R.id.six_btn:
 			resultsText.append("By Type button - sqlite - all Room type nodes (e.g. wang rooms)" + "\n");
 			
 			//appIO.sqlite_async_getData(SQLiteConstants.QUERY_NODES_BY_TYPE, SQLiteConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "room", "wang");
-			appIO.updateListView_sqlite_async(DatabaseConstants.QUERY_NODES_BY_TYPE, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "room","wang");
+			appIO.updateListView_async(DatabaseConstants.QUERY_NODES_BY_TYPE, AppConstants.PROGRESS_BAR_INDETERMINATE, listItems, aa, this, "room","wang");
 			break;
 	
 		default:

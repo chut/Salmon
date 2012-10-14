@@ -1,4 +1,4 @@
-package com.salmon.app;
+package com.salmon.app.io;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -6,17 +6,18 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.salmon.app.Route;
 import com.salmon.app.async_core.TaskBase;
 import com.salmon.app.async_core.UIHandler;
 
-public class RouteTask<E1, E2> extends TaskBase<Integer, E1, E2> {
+public class Task_Route<E1, E2> extends TaskBase<Integer, E1, E2> {
 	
 	private final Context context;
 	private final Route route;
 	private final TextView element; 	// element to be updated - i.e. ArrayList, TextView, etc...
 	
 	/* UI Thread */
-	public RouteTask(Context context, UIHandler handlerUI, Route route, TextView element) {
+	public Task_Route(Context context, UIHandler handlerUI, Route route, TextView element) {
 		super(handlerUI);
 		this.context = context;
 		
