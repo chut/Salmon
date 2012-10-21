@@ -599,14 +599,13 @@ public class Route {
 		//System.out.println("before - route.nodeList: " + nodeList.size());
 		//generateNeighborList(myNode);
 		
+		// if myNode doesn't have any neighbors, then load data from database
 		if (myNode.getNeighborList().size() == 0) {
 			//System.out.println(myNode.getNodeID() + " neighborList is empty - database call");
 			loadFloorNodeNeighborData(myNode);
 		}
 		//System.out.println("after - myNode.neighborList: "	+ myNode.getNeighborList().size());
 		//System.out.println("after - route.nodeList: " + nodeList.size());
-		
-		//System.exit(0);
 		
 		for (int i = 0; i < myNode.getNeighborList().size(); i++) {
 			//System.out.println("n1 nodeID: " + n1.getNode().getNodeID() + ", shortestDist: " + n1.getNode().getShortestDist() + ", distance: " + n1.getDistance());
@@ -686,45 +685,85 @@ public class Route {
 	 * modified:	2/17/2012 - Ken Richards - method now loads all Nodes/Neighbors on
 	 * 					same floor as myNode (it used to only load Neighbors of myNode)
 	 *********************************************************/
-	public Node loadFloorNodeNeighborData(Node myNode, String ... myNodeID) {
+	public Node loadFloorNodeNeighborData(Node myNode, String ... myID) {
 		Log.i("ROUTE","loadFloorNodeNeighborData - begin");
 		// initialize local variables
 		final int NEIGHBORS = DatabaseConstants.QUERY_NEIGHBORS;
+		final int BLDG_FLR = DatabaseConstants.QUERY_BLDG_FLR_BY_NODEID;
 		ArrayList<String> myResultsList = new ArrayList<String>();
 		ArrayList<Node> nodesToBeAdded = new ArrayList<Node>();
 		ArrayList<NodeNeighborMap> nodeNeighborList = new ArrayList<NodeNeighborMap>();
 		String[] fieldsList = null;
 		//String[] rowNode = null;
 		String lastNode = "";
+		String strNodeID = "xxx";
 		Node thisNode = null;
 		Node neighborNode = null;
 		
 		// retrieve list of all Nodes / Neighbors on same floor as myNode from database
 		int d1 = -1;
-		if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
-		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 		if (myNode == null) {
-			if(myNodeID.length > 1) {
-				// buildingID (myNodID[0]) and floorID (myNodeID[1]) were passed as strings
-				Log.i("ROUTE","get data by buildingID and floorID");
-				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
-				
-			} else {
-				// only the nodeID was passed - myNodeID[0]
-				//blackboxOutput.append("database call for: " + myNodeID[0] + "\n");
+			// string IDs were passed - either buildingID and floorID, or nodeID
+//			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+//			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+//			
+//			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
+//			
+//			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+			
+			if (myID.length == 1) {
 				Log.i("ROUTE","get data by nodeID");
-				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
+				strNodeID = myID[0];
+				
+				// obtaining data from database by nodeID is a very costly SQL query
+				// so we will first obtain buildingID, floorID that is associated  
+				// with nodeID from database
+				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+				
+				myResultsList = dbConn.getDataFromDatabase(BLDG_FLR, myID);
+				
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+				
+				// update myNodeID array to include buildingID and floorID
+				myID = myResultsList.get(0).split(",");
+				// myNodeID[0] = buildingID	
+				// myNodeID[1] = floorID
+				Log.i("ROUTE","bldgID: " + myID[0] + ", floorID: " + myID[1]);
+				
+				// obtain data from database using buildingID and floorID (much faster SQL query)				
+				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+				
+				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+			} else {
+				Log.i("ROUTE","get data by buildingID and floorID");
+				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+				
+				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				
+				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			}
+			
+			
 		} else {
 			// node object was passed
-			//blackboxOutput.append("database call for: " + myNode.getNodeID() + "\n");
-			myNodeID = new String[2];
-			myNodeID[0] = myNode.getBuildingID();
-			myNodeID[1] = myNode.getFloorID();
-			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
+			Log.i("ROUTE","get data by Node object");
+			myID = new String[2];
+			myID[0] = myNode.getBuildingID();
+			myID[1] = myNode.getFloorID();
+			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+			
+			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+			
+			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+			
 		}
 		Log.i("ROUTE","nodes obtained from database - next, load into java");
-		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 		
 		if (myResultsList != null) {
 			if (myResultsList.size() > 0) {
@@ -777,7 +816,7 @@ public class Route {
 					
 					// make sure myNode has a handle on the current dijkstra node
 					if (myNode == null) {
-						if (myNodeID[0].equals(fieldsList[0])) myNode = thisNode;
+						if (strNodeID.equals(fieldsList[0])) myNode = thisNode;
 					}
 						
 					// add to node/neighbor temporary list
@@ -792,7 +831,7 @@ public class Route {
 				if (myNode == null) {
 					int index = 0;
 					while (myNode == null && index < nodeList.size()) {
-						if (nodeList.get(index).getBuildingID().equals(myNodeID[0]) && nodeList.get(index).getFloorID().equals(myNodeID[1])) myNode = nodeList.get(index);
+						if (nodeList.get(index).getBuildingID().equals(myID[0]) && nodeList.get(index).getFloorID().equals(myID[1])) myNode = nodeList.get(index);
 						index ++;
 					}
 				}
@@ -856,54 +895,29 @@ public class Route {
 		// find Node with smallest shortestDist
 		ListIterator<Node> litr = unsettledBucket.listIterator();
 		
-//		blackboxOutput.append("endNode: " + endNode.getNodeID() + "\n");
-//		blackboxOutput.append("currentDijkstraNode: " + currentDijkstraNode.getNodeID() + "\n");
-		 
 		while (litr.hasNext() && !foundEndFloor) {
 			Node loopNode = litr.next();
-//			blackboxOutput.append("*****top of while loop" + "\n");
-//			blackboxOutput.append("  loopNode: " + loopNode.getNodeID() + "\n");
-//			if(shortNode != null) {
-//				blackboxOutput.append("  shortNode: " + shortNode.getNodeID() + "\n");
-//			} else {
-//				blackboxOutput.append("  shortNode: null" + "\n");
-//			}
-//			if(shortNodeTieBreaker != null) {
-//				blackboxOutput.append("  shortNodeTieBreaker: " + shortNodeTieBreaker.getNodeID() + "\n");
-//			} else {
-//				blackboxOutput.append("  shortNodeTieBreaker: null" + "\n");
-//			}
-//			blackboxOutput.append("  iShortest: " + iShortest + "\n");
-//			blackboxOutput.append("  foundEndFloor: " + foundEndFloor + "\n");
-//			blackboxOutput.append("-----------------" + "\n");
-			
+
 			// if endNode is on a different floor than currentDijkstraNode
 			if (!(currentDijkstraNode.getBuildingID().equals(endNode.getBuildingID())) || !(currentDijkstraNode.getFloorID().equals(endNode.getFloorID()))) {
-//				blackboxOutput.append("endNode is on a different floor than currentDijkstraNode" + "\n");
 				
 				// if currentDijkstraNode is a connector
 				if (currentDijkstraNode.getIsConnector()) {
-//					blackboxOutput.append("currentDijkstraNode is a connector" + "\n");
 					
 					// if loopNode is on same floor as endNode
 					if ((loopNode.getBuildingID().equals(endNode.getBuildingID())) && (loopNode.getFloorID().equals(endNode.getFloorID()))) {
-//						blackboxOutput.append("loopNode is on same floor as endNode" + "\n");
 						
 						// TODO ** smart node floor check
-//						blackboxOutput.append("smart node floor check" + "\n");
 						shortNode = loopNode;
 						foundEndFloor = true;
 					
 					} else {
 						// loopNode is NOT on same floor as endNode
-//						blackboxOutput.append("loopNode is NOT on same floor as endNode" + "\n");
 						
 						// this is where we would handle finding floor near endNode
 						// for now, just handle this as a regular node
 						
 						if (loopNode.getShortestDist() <= iShortest) {
-//							blackboxOutput.append("loopNode.getShortestDist() <= iShortest" + "\n");
-//							blackboxOutput.append("handle this as a regular node" + "\n");
 							iShortest = loopNode.getShortestDist();
 							shortNode = loopNode;
 						}
@@ -912,44 +926,34 @@ public class Route {
 						
 				} else {
 					// currentDijkstraNode is NOT a connector
-//					blackboxOutput.append("currentDijkstraNode is NOT a connector" + "\n");
 					
 					if (loopNode.getShortestDist() <= iShortest) {
-//						blackboxOutput.append("loopNode.getShortestDist() <= iShortest" + "\n");
 						
 						// if loopNode is a connector
 						if (loopNode.getIsConnector()) {
-//							blackboxOutput.append("loopNode is a connector" + "\n");
 							
 							// TODO ** weighted connector nodes
 							// TODO ** stairs or elevator
-//							blackboxOutput.append("weighted connector nodes & stairs or elevator" + "\n");
 							if (!stairsOrElevator.equals("either") && !currentDijkstraNode.getNodeID().equals(startNode.getNodeID()) && !bIgnoreDeferredSetting) {
 								//System.out.println("stairsOrElevator: " + stairsOrElevator);
 								if (stairsOrElevator.equals("stairs")) {
-//									blackboxOutput.append("stairsOrElevator.equals(stairs)" + "\n");
 									if (loopNode.getNodeType().equals("stairs")) {
-//										blackboxOutput.append("loopNode.getNodeType().equals(stairs)" + "\n");
 										iShortest = loopNode.getShortestDist();
 										shortNodeTieBreaker = loopNode;
 										shortNode = loopNode;
 									} else {
 										// connector node is not stairs, remove it from unsettledBucket and add it to deferredBucket
-//										blackboxOutput.append("deferring node" + "\n");
 										addNodeToDeferred(loopNode);
 										litr.remove();
 									}
 									
 								} else if (stairsOrElevator.equals("elevator")) {
-//									blackboxOutput.append("stairsOrElevator.equals(elevator)" + "\n");
 									if (loopNode.getNodeType().equals("elevator")) {
-//										blackboxOutput.append("loopNode.getNodeType().equals(elevator)" + "\n");
 										iShortest = loopNode.getShortestDist();
 										shortNodeTieBreaker = loopNode;
 										shortNode = loopNode;
 									} else {
 										// connector node is not elevator, remove it from unsettledBucket and add it to deferredBucket
-//										blackboxOutput.append("deferring node" + "\n");
 										addNodeToDeferred(loopNode);
 										litr.remove();
 									}
@@ -957,14 +961,12 @@ public class Route {
 								} else {
 									// stairsOrElevator is set to something it should not
 									// so act as if this setting is set to "either"
-//									blackboxOutput.append("stairsOrElevator is set to something it should not" + "\n");
 									iShortest = loopNode.getShortestDist();
 									shortNodeTieBreaker = loopNode;
 									shortNode = loopNode;
 								}
 							} else {
 								// stairsOrElevator is set to "either", or bIgnoreDeferredSetting == true
-//								blackboxOutput.append("stairsOrElevator is set to 'either', or bIgnoreDeferredSetting == true");
 								iShortest = loopNode.getShortestDist();
 								shortNodeTieBreaker = loopNode;
 								shortNode = loopNode;
@@ -972,7 +974,6 @@ public class Route {
 							
 						} else {
 							// loopNode is NOT a connector
-//							blackboxOutput.append("loopNode is NOT a connector" + "\n");
 							iShortest = loopNode.getShortestDist();
 							shortNode = loopNode;
 							
@@ -984,37 +985,29 @@ public class Route {
 				
 			} else {
 				// endNode is on same floor as currentDijkstraNode
-//				blackboxOutput.append("endNode is on same floor as currentDijkstraNode" + "\n");
 				
 				// if loopNode is NOT on same floor as endNode
 				if ((!loopNode.getBuildingID().equals(endNode.getBuildingID())) || (!loopNode.getFloorID().equals(endNode.getFloorID()))) {
-//					blackboxOutput.append("loopNode is NOT on same floor as endNode" + "\n");
 					
 					// TODO ** same floor only (defer nodes on other floors)
-//					blackboxOutput.append("same floor only (defer nodes on other floors)" + "\n");
 					addNodeToDeferred(loopNode);
 					litr.remove();
 					
 				} else {
 					// loopNode is on same floor as endNode
-//					blackboxOutput.append("loopNode is on same floor as endNode" + "\n");
 					
 					if (loopNode.getShortestDist() <= iShortest) {
-//						blackboxOutput.append("loopNode.getShortestDist() <= iShortest" + "\n");
 						
 						// if loopNode == endNode
 						if (loopNode.getNodeID().equals(endNode.getNodeID())) {
-//							blackboxOutput.append("loopNode == endNode" + "\n");
 							
 							// TODO ** weighted endNode
-//							blackboxOutput.append("weighted endNode" + "\n");
 							iShortest = loopNode.getShortestDist();
 							shortNodeTieBreaker = loopNode;
 							shortNode = loopNode;
 							
 						} else {
 							// loopNode is NOT endNode
-//							blackboxOutput.append("loopNode is NOT endNode" + "\n");
 							iShortest = loopNode.getShortestDist();
 							shortNode = loopNode;
 						}
@@ -1029,129 +1022,12 @@ public class Route {
 		
 		// if there is a tie between shortest distance, shortNodeTieBreaker wins
 		if (shortNodeTieBreaker != null && !foundEndFloor) {
-//			blackboxOutput.append("shortNodeTieBreaker != null && !foundEndFloor" + "\n");
 			if (shortNode.getShortestDist() == shortNodeTieBreaker.getShortestDist()) {
-//				blackboxOutput.append("tie between shortest distance" + "\n");
 				shortNode = shortNodeTieBreaker;
 			}
 		}
 		
-//		blackboxOutput.append("########################" + "\n");
-//		blackboxOutput.append("shortNode: " + shortNode.getNodeID() + "\n");
-//		blackboxOutput.append("########################" + "\n");
-		
-//		//while (litr.hasNext()) {
-//			Node n1 = litr.next();
-//		//for (Node n1 : unsettledBucket) {
-//			//System.out.println("bucket: " + n1.getNodeID() + ", shortestDist: " + n1.getShortestDist() + ", isConnector: " + n1.getIsConnector());
-//			if (n1.getShortestDist() <= iShortest) {
-//				
-//				// TODO ** stairs or elevator
-//				// if stairsOrElevator setting is not set to "either", and the node is a connector, and currentNode is not startNode, and we are not ignoring deferred settings...
-//				if (!stairsOrElevator.equals("either") && n1.getIsConnector() && !currentNode.getNodeID().equals(startNode.getNodeID()) && !bIgnoreDeferredSetting) {
-//					//System.out.println("stairsOrElevator: " + stairsOrElevator);
-//					if (stairsOrElevator.equals("stairs")) {
-//						if (n1.getNodeType().equals("stairs")) {
-//							iShortest = n1.getShortestDist();
-//							shortNode = n1;
-//						} else {
-//							// connector node is not stairs, remove it from unsettledBucket and add it to deferredBucket
-//							addNodeToDeferred(n1);
-//							litr.remove();
-//						}
-//						
-//					} else if (stairsOrElevator.equals("elevator")) {
-//						if (n1.getNodeType().equals("elevator")) {
-//							iShortest = n1.getShortestDist();
-//							shortNode = n1;
-//						} else {
-//							// connector node is not elevator, remove it from unsettledBucket and add it to deferredBucket
-//							addNodeToDeferred(n1);
-//							litr.remove();
-//						}
-//						
-//					} else {
-//						// stairsOrElevator is set to something it should not
-//						// so act as if this setting is set to "either"
-//						iShortest = n1.getShortestDist();
-//						shortNode = n1;
-//					}
-//				} else {
-//					// node is not a connector, or stairsOrElevator is set to "either" - proceed as normal
-//					iShortest = n1.getShortestDist();
-//					shortNode = n1;
-//				}
-//				
-//			}
-//		}  // end while (litr.hasNext())
-//		
-//		// TODO ** smart node floor check
-//		// if endNode is on a different floor
-//		if (!(currentNode.getBuildingID().equals(endNode.getBuildingID())) || !(currentNode.getFloorID().equals(endNode.getFloorID()))) {
-//			
-//			// if currentNode is a connector
-//			if (currentNode.getIsConnector()) {
-//				// try to extract a node that is on same floor as endNode
-//				boolean foundFloor = false;
-//				for (int i = 0; i < unsettledBucket.size(); i++) {
-//					if ((unsettledBucket.get(i).getBuildingID().equals(endNode.getBuildingID())) && (unsettledBucket.get(i).getFloorID().equals(endNode.getFloorID()))) {
-//						shortNode = unsettledBucket.get(i);
-//						foundFloor = true;
-//					}
-//				}
-//				
-//				// if the endNode floor was not found, find the floor closest to it
-//				int closestFloor = -1;
-//				if (!foundFloor) {
-//					
-////					for (Node n5 : unsettledBucket) {
-////						if ((n5.getBuildingID().equals(endNode.getBuildingID())) && (n5.getFloorID().equals(endNode.getFloorID()))) {
-////							shortNode = n5;
-////							foundFloor = true;
-////						}
-////					}
-//					
-//				}
-//				
-//			} else {
-//				
-//				// TODO ** weighted connector nodes
-//				// if there is a tie between shortestDist, connector Nodes win
-//				for (int i = 0; i < unsettledBucket.size(); i++) {
-//					if ((unsettledBucket.get(i).getShortestDist() == shortNode.getShortestDist()) && (unsettledBucket.get(i).getIsConnector())) shortNode = unsettledBucket.get(i);
-//				}
-//			}
-//		}
-//
-//		// TODO ** same floor
-//		//if Node with shortestDist is on same floor as endNode
-//		if ((shortNode.getBuildingID().equals(endNode.getBuildingID())) && (shortNode.getFloorID().equals(endNode.getFloorID()))) {
-//			//System.out.println("shortNode is on same floor as endNode");
-//			
-//			ListIterator<Node> litr2 = unsettledBucket.listIterator();
-//			
-//			// remove all other Nodes in unsettledBucket that are not on same floor as endNode
-//			while (litr2.hasNext()) {
-//				Node nodeObj = litr2.next();
-//				//System.out.println("checking " + nodeObj.getNodeID());
-//				
-//				// if Node in unsettledBucket is not on same floor as endNode, remove it
-//				if (!(nodeObj.getBuildingID().equals(endNode.getBuildingID())) || !(nodeObj.getFloorID().equals(endNode.getFloorID()))) {
-//					//System.out.println("removing " + nodeObj.getNodeID());
-//					litr2.remove();
-//				}
-//				
-//			}
-//			
-//			// TODO ** weighted endNode
-//			// if there is a tie between shortestDist, endNode wins
-//			for (int i = 0; i < unsettledBucket.size(); i++) {
-//				
-//			//}
-//			//for (Node n4 : unsettledBucket) {
-//				if ((unsettledBucket.get(i).getShortestDist() == shortNode.getShortestDist()) && (unsettledBucket.get(i).getNodeID().equals(endNode.getNodeID()))) shortNode = unsettledBucket.get(i);
-//			}
-//		}
+
 		
 		// if we needed to ignore any settings that would defer a connector node, we can turn those settings back on if we have reached a non-connector node
 		if (bIgnoreDeferredSetting && !shortNode.getIsConnector()) {

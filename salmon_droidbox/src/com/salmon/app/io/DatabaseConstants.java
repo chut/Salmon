@@ -78,6 +78,7 @@ public class DatabaseConstants {
 	public static final int QUERY_NODES_BY_FLOOR = 7;
 	public static final int QUERY_NODES_BY_TYPE = 8;
 	public static final int QUERY_DISPLAY_ALLDATA = 9;		// used in testing - synchs, and then displays all data in text view
+	public static final int QUERY_BLDG_FLR_BY_NODEID = 10;
 	
 	// Common - query status codes
 	public static final String RESULT_SUCCESS = "success";

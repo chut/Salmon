@@ -12,23 +12,42 @@ import android.util.Log;
 
 public class SQLiteHelper extends SQLiteOpenHelper{
 
+	private static SQLiteHelper mInstance = null;
 	private ArrayList<String> tabledata;
-
-	public SQLiteHelper(Context context) {
+	
+	public static SQLiteHelper getInstanstance(Context context) {
+		if (mInstance == null) {
+			mInstance = new SQLiteHelper(context);
+		}
+		return mInstance;
+	}
+	
+//	public static SQLiteHelper getInstanstance(Context context, ArrayList<String> tabledata) {
+//		if (mInstance == null) {
+//			mInstance = new SQLiteHelper(context, tabledata);
+//		} else {
+//			mInstance.tabledata = tabledata;
+//		}
+//		
+//		return mInstance;
+//	}
+	
+	private SQLiteHelper(Context context) {
 		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
 		
 		this.tabledata = null;
 	}
 
-	public SQLiteHelper(Context context, ArrayList<String> tabledata) {
-		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
-		
-		this.tabledata = tabledata;
-	}
+//	private SQLiteHelper(Context context, ArrayList<String> tabledata) {
+//		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
+//		
+//		this.tabledata = tabledata;
+//	}
+	
 	
 	public void setTableData (ArrayList<String> tabledata) {
 		Log.i("SQLITE","setTableData table size: " + tabledata.size());
-		this.tabledata = tabledata;
+		mInstance.tabledata = tabledata;
 	}
 	
 	// called to create table

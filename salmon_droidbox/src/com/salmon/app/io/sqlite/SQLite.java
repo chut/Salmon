@@ -19,12 +19,21 @@ public class SQLite implements IDatabaseProvider {
 	private final SQLiteHelper sqliteHelper;
 	private String[] params;
 	private Context context;
+	private SQLiteDatabase db;
 	
 	public SQLite(Context context) {
 		this.context = context;
 		
 		// setup helper
-		this.sqliteHelper = new SQLiteHelper(context);
+		this.sqliteHelper = SQLiteHelper.getInstanstance(context);
+		
+//		// open the SQLite database
+//		try {
+//			db = sqliteHelper.getWritableDatabase();
+//        } catch(SQLException e) { 
+//        	// TODO error handling
+//        	db = null;
+//        }
 	}
 	
 	public ArrayList<String> getDataFromDatabase(int queryType,	String[] params) {
@@ -67,7 +76,11 @@ public class SQLite implements IDatabaseProvider {
 		case DatabaseConstants.QUERY_NEIGHBORS:
 			results.addAll(query_Neighbors());
 			break;
-	    
+			
+		case DatabaseConstants.QUERY_BLDG_FLR_BY_NODEID:
+			results.addAll(query_BldgFloor());
+			break;
+			
 		default:
 			// an unknown querytype has been passed, fail.
 			results.add(DatabaseConstants.RESULT_FAILED);
@@ -76,9 +89,7 @@ public class SQLite implements IDatabaseProvider {
 		
 		return results;
 	}
-	
-	
-	
+			
 	
 	private ArrayList<String> query_SynchDB () {
 		Log.i("SQLITE", "sync db");
@@ -361,7 +372,6 @@ public class SQLite implements IDatabaseProvider {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		final ArrayList<String> results = new ArrayList<String>();
-		String strSQL = null;
 		
 		Log.i("SQLITE","Params.length:" + params.length);
 		// construct SQL statements
@@ -478,11 +488,59 @@ public class SQLite implements IDatabaseProvider {
 		if (db != null) {db.close();}
 		
 //		if (this.future == null || !this.future.isCancelled()) {
-			Log.i("SQLITE","AllData - results.size: " + results.size());
+			Log.i("SQLITE","query_Neighbors - results.size: " + results.size());
 			return results;
 //		} else {
 //			return null;
 //		}
 
+	}
+	
+	private ArrayList<String> query_BldgFloor() {
+		Log.i("SQLITE", "query_BldgFloor - begin");
+		
+		SQLiteDatabase db = null;
+		Cursor cursor = null;
+		final ArrayList<String> results = new ArrayList<String>();
+		
+		// open the SQLite database
+		try {
+			db = sqliteHelper.getWritableDatabase();
+        } catch(SQLException e) { 
+        	// TODO error handling
+        	if (db != null) {db.close();}
+        	results.add(DatabaseConstants.RESULT_FAILED);
+        	return results;
+        }
+		//Log.i("SQLITE","Database open");
+		
+		// construct SQL statements
+		final String strSQL = "SELECT " + DatabaseConstants.KEY_BUILDING_ID + ", "
+										+ DatabaseConstants.KEY_FLOOR_ID + 
+							 " FROM " + DatabaseConstants.TABLE_NAME + 
+							 " WHERE " + DatabaseConstants.KEY_NODE_ID + "=\"" + params[0] + "\"";
+		
+		// obtain data from sqlite database
+		cursor = db.rawQuery(strSQL, null);
+		//Log.i("SQLITE","data obtained");
+		
+		// create a comma delimited ArrayList<String> from cursor results
+		while (cursor.moveToNext()) {
+			results.add(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID)) + "," 
+					  + cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID)));
+		}
+		//Log.i("SQLITE","result string generated");
+		
+		// close the database connection, and return results
+		if (cursor != null) {cursor.close();}
+		if (db != null) {db.close();}
+		
+//		if (this.future == null || !this.future.isCancelled()) {
+			Log.i("SQLITE","query_BldgFloor - results.size: " + results.size());
+			return results;
+//		} else {
+//			return null;
+//		}
+		        
 	}
 }
