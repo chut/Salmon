@@ -373,8 +373,13 @@ public class SQLite implements IDatabaseProvider {
 		Cursor cursor = null;
 		final ArrayList<String> results = new ArrayList<String>();
 		
+		// for testing
+		long startTime = 0;
+		long endTime = 0;
+		
 		Log.i("SQLITE","Params.length:" + params.length);
 		// construct SQL statements
+		startTime = System.currentTimeMillis();
 		StringBuilder sbSQL = new StringBuilder(512);
 		if (params.length == 1) {
 			// nodeID (params[0]) was passed.  base SQL off nodeID
@@ -438,12 +443,15 @@ public class SQLite implements IDatabaseProvider {
 //								+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \"" + params[1] + "\") "
 //				+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
 		}
+		endTime = System.currentTimeMillis();
+		Log.i("MICRO","create SQL statement took: " + (endTime - startTime) + " milliseconds");
 		
 		//Log.i("SQLITE","SQL: " + strSQL);
 		//Log.i("SQLITE","strSQL.length: " + strSQL.length());
 		
 		
 		// open the SQLite database
+		startTime = System.currentTimeMillis();
 		try {
 			db = sqliteHelper.getWritableDatabase();
         } catch(SQLException e) { 
@@ -452,40 +460,84 @@ public class SQLite implements IDatabaseProvider {
         	results.add(DatabaseConstants.RESULT_FAILED);
         	return results;
         }
+		endTime = System.currentTimeMillis();
+		Log.i("MICRO","open db took: " + (endTime - startTime) + " milliseconds");
 		
 		// obtain data from sqlite database
+		startTime = System.currentTimeMillis();
 		cursor = db.rawQuery(sbSQL.toString(), null);
-        
+		endTime = System.currentTimeMillis();
+		Log.i("MICRO","get cursor data took: " + (endTime - startTime) + " milliseconds");
+		
 		StringBuilder sbRow; 
 		
         // create a comma delimited ArrayList<String> from cursor results
 		//if (this.future == null || !this.future.isCancelled()) {
+		startTime = System.currentTimeMillis();
 			while (cursor.moveToNext()) {
 				sbRow = new StringBuilder(128);
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID))).append(","); 
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE))).append(","); 
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img))).append(",");
-	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME)));
+//				Log.i("SQLITE","index 0 - nodeID: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_ID))).append(","); 
+//	        	Log.i("SQLITE","index 1 - neighborID: " + cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_NODE))).append(",");
+//	        	Log.i("SQLITE","index 2 - label: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_LABEL))).append(",");
+//	        	Log.i("SQLITE","index 3 - dist: " + cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NEIGHBOR_DISTANCE))).append(","); 
+//	        	Log.i("SQLITE","index 4 - type: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_TYPE))).append(",");
+//	        	Log.i("SQLITE","index 5 - bldgID: " + cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_ID))).append(",");
+//	        	Log.i("SQLITE","index 6 - flrID: " + cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_ID))).append(",");
+//	        	Log.i("SQLITE","index 7 - level: " + cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_LEVEL))).append(",");
+//	        	Log.i("SQLITE","index 8 - isConn: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_CONNECTOR))).append(",");
+//	        	Log.i("SQLITE","index 9 - map: " + cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_FLOOR_MAP))).append(",");
+//	        	Log.i("SQLITE","index 10 - photo: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_PHOTO))).append(",");
+//	        	Log.i("SQLITE","index 11 - x: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_X))).append(",");
+//	        	Log.i("SQLITE","index 12 - y: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_Y))).append(",");
+//	        	Log.i("SQLITE","index 13 - isPOI: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_IS_POI))).append(",");
+//	        	Log.i("SQLITE","index 14 - poiImg: " + cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_NODE_POI_Img))).append(",");
+//	        	Log.i("SQLITE","index 15 - bldgName: " + cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME));
+//	        	sbRow.append(cursor.getString(cursor.getColumnIndex(DatabaseConstants.KEY_BUILDING_NAME)));
+	        	
+	        	sbRow.append(cursor.getString(0)).append(",");	// nodeID 
+	        	sbRow.append(cursor.getString(14)).append(",");	// neighborID
+	        	sbRow.append(cursor.getString(1)).append(",");	// node label
+	        	sbRow.append(cursor.getString(15)).append(","); // distance
+	        	sbRow.append(cursor.getString(2)).append(",");	// node type
+	        	sbRow.append(cursor.getString(9)).append(",");	// buildingID
+	        	sbRow.append(cursor.getString(11)).append(",");	// floor ID
+	        	sbRow.append(cursor.getString(12)).append(","); // floor level
+	        	sbRow.append(cursor.getString(6)).append(",");	// isConnector
+	        	sbRow.append(cursor.getString(13)).append(",");	// floor map
+	        	sbRow.append(cursor.getString(3)).append(",");	// node photo
+	        	sbRow.append(cursor.getString(4)).append(",");	// x
+	        	sbRow.append(cursor.getString(5)).append(",");	// y
+	        	sbRow.append(cursor.getString(7)).append(",");	// isPOI
+	        	sbRow.append(cursor.getString(8)).append(",");	// POI img
+	        	sbRow.append(cursor.getString(10));				// building name
 	        	results.add(sbRow.toString());
 	        	sbRow = null;
 			}
 		//}
-		
+		endTime = System.currentTimeMillis();
+		Log.i("MICRO","create results array took: " + (endTime - startTime) + " milliseconds");
+			
 		// close the database connection, and return results
+		startTime = System.currentTimeMillis();
 		if (cursor != null) {cursor.close();}
 		if (db != null) {db.close();}
+		endTime = System.currentTimeMillis();
+		Log.i("MICRO","close resources took: " + (endTime - startTime) + " milliseconds");
 		
 //		if (this.future == null || !this.future.isCancelled()) {
 			Log.i("SQLITE","query_Neighbors - results.size: " + results.size());

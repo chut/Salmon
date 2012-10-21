@@ -1,5 +1,5 @@
 package com.metrics;
-// kickass!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 import java.util.ArrayList;
 
 public class MetricGroup {
