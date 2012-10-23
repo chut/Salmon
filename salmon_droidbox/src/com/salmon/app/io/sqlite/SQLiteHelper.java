@@ -15,7 +15,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 	private static SQLiteHelper mInstance = null;
 	private ArrayList<String> tabledata = null;
 	
-	public static SQLiteHelper getInstanstance(Context context) {
+	public static SQLiteHelper getInstance(Context context) {
 		if (mInstance == null) {
 			mInstance = new SQLiteHelper(context);
 		}

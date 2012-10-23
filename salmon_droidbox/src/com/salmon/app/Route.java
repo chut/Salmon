@@ -32,6 +32,8 @@ import com.metrics.MetricGroup;
 public class Route {
 
 	// fields
+	private static Route mInstance = null;
+	
 	private final Context context;
 	private String routeID;
 	private ArrayList<RouteStep> routeStepList;
@@ -52,21 +54,29 @@ public class Route {
 	private IDatabaseProvider dbConn;
 	private MetricGroup myMetrics;
 	
+	public static Route getInstance(Context context, String routeID, Node startNode, Node endNode) {
+		if (mInstance == null) {
+			mInstance = new Route(context, routeID, startNode, endNode);
+		}
+		return mInstance;
+	}
+	
+	public static Route getInstance(Context context, String routeID, String startNodeID, String endNodeID, String ... settings) {
+		if (mInstance == null) {
+			mInstance = new Route(context, routeID, startNodeID, endNodeID, settings);
+		}
+		return mInstance;
+	}
+	
+	public static Route getInstance(Context context) {
+		if (mInstance == null) {
+			mInstance = new Route(context);
+		}
+		return mInstance;
+	}
+	
 	// constructor 
-	/**********************************************************
-	 * public Route()
-	 **********************************************************
-	 * description:	Constructor used when you have the start and 
-	 * 				end node objects (as opposed to just their
-	 * 				string IDs)
-	 * 				Note - this constructor is used primarily in
-	 * 					test environments.  
-	 * constructor:	
-	 * creator:		Ken Richards, 02/11/2012
-	 * modified:	
-	 * @return 
-	 *********************************************************/
-	public Route(Context context, String routeID, Node startNode, Node endNode) {
+	private Route(Context context, String routeID, Node startNode, Node endNode) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		
@@ -84,14 +94,14 @@ public class Route {
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 									
 			break;
@@ -108,18 +118,7 @@ public class Route {
 	}
 
 	// overload constructor
-	/**********************************************************
-	 * public Route()
-	 **********************************************************
-	 * description:	Constructor used when you have the start and 
-	 * 				end node string IDs
-	 * 				Note - this constructor is used primarily in
-	 * 					test environments.  
-	 * constructor:	
-	 * creator:		Ken Richards
-	 * modified:	
-	 *********************************************************/
-	public Route(Context context, String routeID, String startNodeID, String endNodeID, String ... settings) {
+	private Route(Context context, String routeID, String startNodeID, String endNodeID, String ... settings) {
 		this.myMetrics = new MetricGroup();
 		myMetrics.addMetric(routeID).setStartTime();
 		myMetrics.setDbaseProvider(getDatabaseProvider());
@@ -138,14 +137,14 @@ public class Route {
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
@@ -180,20 +179,40 @@ public class Route {
 	}
 	
 	// overload constructor
-	/**********************************************************
-	 * public Route()
-	 **********************************************************
-	 * description:	Constructor used to create object in app
-	 * 				Note - after object is created, use the setup()
-	 * 					method to pass start/end IDs, and verbose/stairs settings.
-	 * 					After setup info has been passed, use initialize()  
-	 * constructor:	
-	 * creator:		Ken Richards
-	 * modified:	
-	 *********************************************************/
-	public Route(Context context) {
-		// intentionally left blank.  intention is to only create object.  use setup() and initialize() to complete object setup
+	private Route(Context context) {
 		this.context = context;
+		
+		// initialize array lists
+		this.routeStepList = new ArrayList<RouteStep>();
+		this.nodeList = new ArrayList<Node>();
+		
+		// setup database connection provider
+		//switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
+		switch (Integer.parseInt(AppPrefs.getAlogrithmDatabaseProvider(context))) {
+		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
+			dbConn = new HTTP_Apache();
+			Log.i("ROUTE","Provider - HTTP_Apache");
+			break;
+		
+		case AppConstants.PROVIDER_EXT_SOCKET:
+			dbConn = new Socket();
+			Log.i("ROUTE","Provider - Socket");
+			break;
+		
+		case AppConstants.PROVIDER_INT_SQLITE:
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstance(context);
+			Log.i("ROUTE","Provider - SQLITE");
+			break;
+		
+		default:
+			// default to SQLITE
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstance(context);
+			Log.i("ROUTE","Provider - defaulting to SQLITE");
+						
+			break;
+		}
 	}
 	
 	// this is a low cost method, meant to be run from the GUI thread
@@ -221,38 +240,9 @@ public class Route {
 		myMetrics.addMetric(routeID).setStartTime();
 		myMetrics.setDbaseProvider(getDatabaseProvider());
 		
-		// setup database connection provider
-		//switch (AppConstants.DATABASE_PROVIDER_ALGORITHM) {
-		switch (Integer.parseInt(AppPrefs.getAlogrithmDatabaseProvider(context))) {
-		case AppConstants.PROVIDER_EXT_HTTP_APACHE:
-			dbConn = new HTTP_Apache();
-			Log.i("ROUTE","Provider - HTTP_Apache");
-			break;
-		
-		case AppConstants.PROVIDER_EXT_SOCKET:
-			dbConn = new Socket();
-			Log.i("ROUTE","Provider - Socket");
-			break;
-		
-		case AppConstants.PROVIDER_INT_SQLITE:
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
-			Log.i("ROUTE","Provider - SQLITE");
-			break;
-		
-		default:
-			// default to SQLITE
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
-			Log.i("ROUTE","Provider - defaulting to SQLITE");
-						
-			break;
-		}
-				
 		// initialize array lists
 		this.routeStepList = new ArrayList<RouteStep>();
-		this.nodeList = new ArrayList<Node>();
-		
+				
 		// convert the start/end string IDs into Node objects
 		this.startNode = getNodeByID(startNodeID);
 		if (this.startNode == null) {
@@ -398,14 +388,14 @@ public class Route {
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
@@ -784,19 +774,19 @@ public class Route {
 				//Collections.sort(myResultsList);
 			
 				String cursor_NodeID;	 				
-				//String cursor_nodeLabel;				
+				String cursor_nodeLabel;				
 				String cursor_typeName;					
-				//String cursor_photoImg;				
-				//int cursor_x;							
-				//int cursor_y;							
+				String cursor_photoImg;				
+				int cursor_x;							
+				int cursor_y;							
 				boolean cursor_isConnector;	
-				//boolean cursor_isPOI;			
-				//String cursor_poiIconImg;			
+				boolean cursor_isPOI;			
+				String cursor_poiIconImg;			
 				String cursor_buildingID;				
 				//String cursor_buildingName;			
 				String cursor_floorID;				
-				//int cursor_floorLevel;					
-				//String cursor_mapImg;				
+				int cursor_floorLevel;					
+				String cursor_mapImg;				
 				String cursor_neighborNode;			
 				int cursor_distance;				
 				
@@ -805,51 +795,59 @@ public class Route {
 				while (dbConn.getCursor().moveToNext()) {
 					//Log.i("ROUTE","loading...");
 					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
-					//cursor_nodeLabel = dbConn.getCursor().getString(1);					// columnIndex 1 = nodeLabel
-					cursor_typeName = dbConn.getCursor().getString(1);					// columnIndex 2 = typeName
-					//cursor_photoImg = dbConn.getCursor().getString(3);					// columnIndex 3 = photoImg
-					//cursor_x = dbConn.getCursor().getInt(4);							// columnIndex 4 = x
-					//cursor_y = dbConn.getCursor().getInt(5);							// columnIndex 5 = y
-					cursor_isConnector = dbConn.getCursor().getString(2).equals("1");	// columnIndex 6 = isConnector
-					//cursor_isPOI = dbConn.getCursor().getString(7).equals("1");			// columnIndex 7 = isPOI
-					//cursor_poiIconImg = dbConn.getCursor().getString(8);				// columnIndex 8 = poiIconImg
-					cursor_buildingID = dbConn.getCursor().getString(3);				// columnIndex 9 = buildingID
+					cursor_nodeLabel = dbConn.getCursor().getString(1);					// columnIndex 1 = nodeLabel
+					cursor_typeName = dbConn.getCursor().getString(2);					// columnIndex 2 = typeName
+					cursor_photoImg = dbConn.getCursor().getString(3);					// columnIndex 3 = photoImg
+					cursor_x = dbConn.getCursor().getInt(4);							// columnIndex 4 = x
+					cursor_y = dbConn.getCursor().getInt(5);							// columnIndex 5 = y
+					cursor_isConnector = dbConn.getCursor().getString(6).equals("1");	// columnIndex 6 = isConnector
+					cursor_isPOI = dbConn.getCursor().getString(7).equals("1");			// columnIndex 7 = isPOI
+					cursor_poiIconImg = dbConn.getCursor().getString(8);				// columnIndex 8 = poiIconImg
+					cursor_buildingID = dbConn.getCursor().getString(9);				// columnIndex 9 = buildingID
 					//cursor_buildingName =dbConn.getCursor().getString(10);				// columnIndex 10 = buildingName
-					cursor_floorID = dbConn.getCursor().getString(4);					// columnIndex 11 = floorID
-					//cursor_floorLevel = dbConn.getCursor().getInt(12);					// columnIndex 12 = floorLevel
-					//cursor_mapImg = dbConn.getCursor().getString(13);					// columnIndex 13 = mapImg
-					cursor_neighborNode = dbConn.getCursor().getString(5);				// columnIndex 14 = neighborNode
-					cursor_distance = dbConn.getCursor().getInt(6);					// columnIndex 15 = distance
+					cursor_floorID = dbConn.getCursor().getString(11);					// columnIndex 11 = floorID
+					cursor_floorLevel = dbConn.getCursor().getInt(12);					// columnIndex 12 = floorLevel
+					cursor_mapImg = dbConn.getCursor().getString(13);					// columnIndex 13 = mapImg
+					cursor_neighborNode = dbConn.getCursor().getString(14);				// columnIndex 14 = neighborNode
+					cursor_distance = dbConn.getCursor().getInt(15);					// columnIndex 15 = distance
+					
+//					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
+//					cursor_typeName = dbConn.getCursor().getString(1);					// columnIndex 1 = typeName
+//					cursor_isConnector = dbConn.getCursor().getString(2).equals("1");	// columnIndex 2 = isConnector
+//					cursor_buildingID = dbConn.getCursor().getString(3);				// columnIndex 3 = buildingID
+//					cursor_floorID = dbConn.getCursor().getString(4);					// columnIndex 4 = floorID
+//					cursor_neighborNode = dbConn.getCursor().getString(5);				// columnIndex 5 = neighborNode
+//					cursor_distance = dbConn.getCursor().getInt(6);						// columnIndex 6 = distance
 					
 					// since resultList is sorted (SQL-side ORDER BY), we can skip duplicate Nodes
 					if (!lastNode.equals(cursor_NodeID)) {
 						// create the node to be added (note: nodeID is fieldList[0], NOT fieldList[1].  This is because the query results treat the neighbor as the full node object, and the nodeID as the ID of the neighbor (backwards, ya I know)
-//						thisNode = new Node(cursor_NodeID,
-//											cursor_nodeLabel,
-//											cursor_buildingID,
-//											cursor_floorID,
-//											cursor_floorLevel,
-//											cursor_typeName,
-//											cursor_isConnector,
-//											cursor_mapImg,
-//											cursor_photoImg,
-//											cursor_x,
-//											cursor_y,
-//											cursor_isPOI,
-//											cursor_poiIconImg);
 						thisNode = new Node(cursor_NodeID,
-											null,	//nodeLabel					
+											cursor_nodeLabel,
 											cursor_buildingID,
 											cursor_floorID,
-											-1, 	//floorLevel
+											cursor_floorLevel,
 											cursor_typeName,
 											cursor_isConnector,
-											null,	//mapImg
-											null,	//photoImg
-											-1,		//x
-											-1,		//y
-											false,	//isPOI
-											null);	//poiIconImg
+											cursor_mapImg,
+											cursor_photoImg,
+											cursor_x,
+											cursor_y,
+											cursor_isPOI,
+											cursor_poiIconImg);
+//						thisNode = new Node(cursor_NodeID,
+//											null,	//nodeLabel					
+//											cursor_buildingID,
+//											cursor_floorID,
+//											-1, 	//floorLevel
+//											cursor_typeName,
+//											cursor_isConnector,
+//											null,	//mapImg
+//											null,	//photoImg
+//											-1,		//x
+//											-1,		//y
+//											false,	//isPOI
+//											null);	//poiIconImg
 						
 						// if Node is not a connector, then add it
 						if (!cursor_isConnector) {
@@ -1209,26 +1207,26 @@ public class Route {
 		// begin with endNode
 		// create route step - add Node, direction text
 		Log.i("RSTEP","get route step info");
-		int d1 = -1;
-		String[] myID = new String[1];
-		myID[0] = endNode.getNodeID();
-		if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
-		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
-		
-		dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
-		
-		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
-		
-		dbConn.getCursor().moveToFirst();
-		endNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
-		endNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
-		endNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
-		endNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
-		endNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
-		endNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
-		//endNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
-		endNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
-		endNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
+//		int d1 = -1;
+//		String[] myID = new String[1];
+//		myID[0] = endNode.getNodeID();
+//		if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+//		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+//		
+//		dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
+//		
+//		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+//		
+//		dbConn.getCursor().moveToFirst();
+//		endNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
+//		endNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
+//		endNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
+//		endNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
+//		endNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
+//		endNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
+//		//endNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
+//		endNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
+//		endNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
 				
 		addRouteStep(new RouteStep(endNode, "node: " + endNode.getNodeID(),-1));	// we can't put this in the while loop because we need to hardcode the -1 value
 		
@@ -1239,25 +1237,25 @@ public class Route {
 		// add routeSteps
 		// if currPoint is null, we have reached the start location
 		while (currentNode != null) {
-			myID[0] = currentNode.getNodeID();
-			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
-			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
-			
-			dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
-			
-			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
-			
-			dbConn.getCursor().moveToFirst();
-			currentNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
-			currentNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
-			currentNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
-			currentNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
-			currentNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
-			currentNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
-			//currentNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
-			currentNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
-			currentNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
-			
+//			myID[0] = currentNode.getNodeID();
+//			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+//			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+//			
+//			dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
+//			
+//			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+//			
+//			dbConn.getCursor().moveToFirst();
+//			currentNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
+//			currentNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
+//			currentNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
+//			currentNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
+//			currentNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
+//			currentNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
+//			//currentNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
+//			currentNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
+//			currentNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
+		
 			addRouteStep(new RouteStep(currentNode,"node: " + currentNode.getNodeID(), currentNode.getNeighborByNode(neighborNode).getDistance()));
 			neighborNode = currentNode;
 			currentNode = currentNode.getPredecessor();

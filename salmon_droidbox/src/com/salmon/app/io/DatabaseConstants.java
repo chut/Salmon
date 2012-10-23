@@ -87,13 +87,14 @@ public class DatabaseConstants {
 	
 	// Query String - algorithm data - one variable = nodeID
 	public static final String SQL_NODEID_1 = ""	
-			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
-						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
-						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
-						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
-						+ DatabaseConstants.KEY_FLOOR_ID + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+//			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+//						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+//						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+//						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+//						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+			+ "SELECT *"			
 			+ " FROM " + DatabaseConstants.TABLE_NAME 
 			+ " WHERE " 
 				+ DatabaseConstants.KEY_BUILDING_ID + " IN "
@@ -105,13 +106,14 @@ public class DatabaseConstants {
 						+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; //+ nodeID + 
 	public static final String SQL_NODEID_3	= "\") " 
 			+ "UNION ALL " 
-			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
-						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
-						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
-						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
-						+ DatabaseConstants.KEY_FLOOR_ID + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+//			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+//						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+//						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+//						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+//						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+			+ "SELECT *"			
 			+ " FROM " + DatabaseConstants.TABLE_NAME 
 			+ " WHERE "
 				+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
@@ -128,28 +130,30 @@ public class DatabaseConstants {
 	public static final String SQL_NODEID_5	= "\")) "
 			+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
 	
-	// Query String - algrorithm data - two variables = buildingID, floorID
+	// Query String - algorithm data - two variables = buildingID, floorID
 	public static final String SQL_BLDFLR_1	= ""
-			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
-						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
-						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
-						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
-						+ DatabaseConstants.KEY_FLOOR_ID + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+//			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+//						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+//						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+//						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+//						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+			+ "SELECT *"			
 			+ " FROM " + DatabaseConstants.TABLE_NAME
 			+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \""; //+ buildingID + 
 	public static final String SQL_BLDFLR_2	= "\" "
 				+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \""; //+ floorID + 
 	public static final String SQL_BLDFLR_3	= "\" " 
 			+ " UNION ALL "
-			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
-						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
-						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
-						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
-						+ DatabaseConstants.KEY_FLOOR_ID + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
-						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+//			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+//						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+//						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+//						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+//						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+//						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+			+ "SELECT *"			
 			+ " FROM " + DatabaseConstants.TABLE_NAME
 			+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
 				+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "

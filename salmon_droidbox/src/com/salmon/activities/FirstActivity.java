@@ -81,7 +81,7 @@ public class FirstActivity extends ListActivity implements OnClickListener {
         
         appIO = new AppIO(AsyncConstants.DEFAULT_THREAD_POOL_SIZE);
         
-        r2 = new Route(this);
+        r2 = Route.getInstance(this);
         //async.handleRetainedTask(getLastNonConfigurationInstance());
         
     	resultsText.setText("Blackbox started at " + new Date() + "\n");

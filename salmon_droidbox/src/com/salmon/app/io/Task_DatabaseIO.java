@@ -43,14 +43,14 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 		case AppConstants.PROVIDER_INT_SQLITE:
 			// TODO SQLITE 
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			break;
 
 		default:
 			// default to SQLITE
 			// TODO SQLITE 
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			
 			break;
 		}
@@ -78,14 +78,14 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 		case AppConstants.PROVIDER_INT_SQLITE:
 			// TODO SQLITE 
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			break;
 
 		default:
 			// default to SQLITE
 			// TODO SQLITE 
 			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstanstance(context);
+			dbConn = SQLite.getInstance(context);
 			
 			break;
 		}

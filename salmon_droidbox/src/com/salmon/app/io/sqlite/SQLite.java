@@ -19,7 +19,7 @@ public class SQLite implements IDatabaseProvider {
 	private SQLiteDatabase db = null;
 	private Cursor cursor = null;
 	
-	public static SQLite getInstanstance(Context context) {
+	public static SQLite getInstance(Context context) {
 		if (mInstance == null) {
 			mInstance = new SQLite(context);
 		}
@@ -30,7 +30,7 @@ public class SQLite implements IDatabaseProvider {
 		this.context = context;
 		
 		// setup helper
-		this.sqliteHelper = SQLiteHelper.getInstanstance(context);
+		this.sqliteHelper = SQLiteHelper.getInstance(context);
 		
 		// open the SQLite database
 		openDatabaseConnection();
