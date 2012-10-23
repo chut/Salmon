@@ -1,7 +1,9 @@
 package com.salmon.app.io;
 
-import java.util.ArrayList;
+import android.database.Cursor;
 
 public interface IDatabaseProvider {
-	public ArrayList<String> getDataFromDatabase(int queryType, String[] strValue);
+	public Cursor getDataFromDatabase(int queryType, String[] strValue);
+	public Cursor getCursor();
+	public void close();
 }

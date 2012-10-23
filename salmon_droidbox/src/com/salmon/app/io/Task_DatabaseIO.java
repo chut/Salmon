@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,13 +42,15 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 		
 		case AppConstants.PROVIDER_INT_SQLITE:
 			// TODO SQLITE 
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			break;
 
 		default:
 			// default to SQLITE
 			// TODO SQLITE 
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			
 			break;
 		}
@@ -74,13 +77,15 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 		
 		case AppConstants.PROVIDER_INT_SQLITE:
 			// TODO SQLITE 
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			break;
 
 		default:
 			// default to SQLITE
 			// TODO SQLITE 
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			
 			break;
 		}
@@ -103,7 +108,25 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 //			
 //			break;
 //		default:
-			results.addAll(dbConn.getDataFromDatabase(querytype, params));
+			//results.addAll(dbConn.getDataFromDatabase(querytype, params));
+			Cursor cursor = dbConn.getDataFromDatabase(querytype, params);
+			
+			if (cursor != null) {
+				final int numCols = cursor.getColumnCount() - 1;
+				StringBuilder sbRow;
+				while (cursor.moveToNext()) {
+					sbRow = new StringBuilder(128);
+					for (int i = 0; i < numCols; i++) {
+						sbRow.append(cursor.getString(i)).append(",");
+					}
+					results.add(sbRow.toString());
+		        	sbRow = null;
+				}
+				cursor.close();
+				dbConn.close();
+			} else {
+				results.add(DatabaseConstants.RESULT_FAILED);
+			}
 //			break;
 //		}
 		

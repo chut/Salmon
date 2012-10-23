@@ -79,13 +79,22 @@ public class DatabaseConstants {
 	public static final int QUERY_NODES_BY_TYPE = 8;
 	public static final int QUERY_DISPLAY_ALLDATA = 9;		// used in testing - synchs, and then displays all data in text view
 	public static final int QUERY_BLDG_FLR_BY_NODEID = 10;
+	public static final int QUERY_ROUTESTEP_BY_NODEID = 11;
 	
 	// Common - query status codes
 	public static final String RESULT_SUCCESS = "success";
 	public static final String RESULT_FAILED = "failed";
 	
+	// Query String - algorithm data - one variable = nodeID
 	public static final String SQL_NODEID_1 = ""	
-			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME 
+			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+			+ " FROM " + DatabaseConstants.TABLE_NAME 
 			+ " WHERE " 
 				+ DatabaseConstants.KEY_BUILDING_ID + " IN "
 					+ "(SELECT " + DatabaseConstants.KEY_BUILDING_ID + " FROM " + DatabaseConstants.TABLE_NAME 
@@ -96,7 +105,14 @@ public class DatabaseConstants {
 						+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; //+ nodeID + 
 	public static final String SQL_NODEID_3	= "\") " 
 			+ "UNION ALL " 
-			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+			+ " FROM " + DatabaseConstants.TABLE_NAME 
 			+ " WHERE "
 				+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
 				+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
@@ -112,14 +128,29 @@ public class DatabaseConstants {
 	public static final String SQL_NODEID_5	= "\")) "
 			+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
 	
+	// Query String - algrorithm data - two variables = buildingID, floorID
 	public static final String SQL_BLDFLR_1	= ""
-			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE 
+			+ " FROM " + DatabaseConstants.TABLE_NAME
 			+ " WHERE " + DatabaseConstants.KEY_BUILDING_ID + " = \""; //+ buildingID + 
 	public static final String SQL_BLDFLR_2	= "\" "
 				+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \""; //+ floorID + 
 	public static final String SQL_BLDFLR_3	= "\" " 
 			+ " UNION ALL "
-			+ "SELECT * FROM " + DatabaseConstants.TABLE_NAME
+			+ "SELECT " + DatabaseConstants.KEY_NODE_ID + ", "
+						+ DatabaseConstants.KEY_NODE_TYPE + ", " 
+						+ DatabaseConstants.KEY_NODE_IS_CONNECTOR + ", " 
+						+ DatabaseConstants.KEY_BUILDING_ID + ", " 
+						+ DatabaseConstants.KEY_FLOOR_ID + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_NODE + ", "
+						+ DatabaseConstants.KEY_NEIGHBOR_DISTANCE
+			+ " FROM " + DatabaseConstants.TABLE_NAME
 			+ " WHERE " + DatabaseConstants.KEY_NODE_IS_CONNECTOR + " = 1 "
 				+ "AND " + DatabaseConstants.KEY_NEIGHBOR_NODE + " IN "
 					+ "(SELECT " + DatabaseConstants.KEY_NODE_ID + " FROM " + DatabaseConstants.TABLE_NAME
@@ -129,5 +160,21 @@ public class DatabaseConstants {
 							+ "AND " + DatabaseConstants.KEY_FLOOR_ID + " = \""; //+ floorID + 
 	public static final String SQL_BLDFLR_5	= "\") "
 			+ "ORDER BY " + DatabaseConstants.KEY_NODE_ID;
-		
+	
+	// Query String - route step info - one variable = routeID
+	public static final String SQL_ROUTESTEP_INFO_1 = ""
+			+ "SELECT "	+ DatabaseConstants.KEY_NODE_LABEL + ", "
+						+ DatabaseConstants.KEY_NODE_PHOTO + ", " 
+						+ DatabaseConstants.KEY_NODE_X + ", " 
+						+ DatabaseConstants.KEY_NODE_Y + ", " 
+						+ DatabaseConstants.KEY_NODE_IS_POI + ", " 
+						+ DatabaseConstants.KEY_NODE_POI_Img + ", " 
+						+ DatabaseConstants.KEY_BUILDING_NAME + ", " 
+						+ DatabaseConstants.KEY_FLOOR_LEVEL + ", " 
+						+ DatabaseConstants.KEY_FLOOR_MAP
+			+ " FROM "  + DatabaseConstants.TABLE_NAME
+			+ " WHERE " + DatabaseConstants.KEY_NODE_ID + " = \""; // + nodeID +
+	public static final String SQL_ROUTESTEP_INFO_2 = "\"";
+						
+			
 }

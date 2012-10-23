@@ -11,6 +11,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.database.Cursor;
+
 import com.salmon.app.io.DatabaseConstants;
 import com.salmon.app.io.IDatabaseProvider;
 
@@ -20,7 +22,7 @@ public class HTTP_Apache implements IDatabaseProvider {
 		
 	}
 	
-	public ArrayList<String> getDataFromDatabase(int queryType, String[] strValue) {
+	public Cursor getDataFromDatabase(int queryType, String[] strValue) {
 		//System.out.println("getDataFromDatabase - strSQL = " + strSQL);
 		ArrayList<String> resultArray = new ArrayList<String>();
 		
@@ -105,7 +107,9 @@ public class HTTP_Apache implements IDatabaseProvider {
 				}
 				
 				System.out.println("resultArray.size: " + resultArray.size());
-				return resultArray;
+				//return resultArray;
+				// TODO fix this!!!!!
+				return null;
 			}
 
 			
@@ -123,6 +127,16 @@ public class HTTP_Apache implements IDatabaseProvider {
 //			if (httpclient != null) {httpclient = null;}	
 		}
 		
+		return null;
+	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Cursor getCursor() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

@@ -8,6 +8,7 @@ import java.util.ListIterator;
 //import javax.swing.JTextArea;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import com.salmon.activities.AppPrefs;
@@ -82,13 +83,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 									
 			break;
@@ -134,13 +137,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
@@ -230,13 +235,15 @@ public class Route {
 			break;
 		
 		case AppConstants.PROVIDER_INT_SQLITE:
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 						
 			break;
@@ -390,13 +397,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			dbConn = new SQLite(context);
+			//dbConn = new SQLite(context);
+			dbConn = SQLite.getInstanstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
@@ -433,7 +442,7 @@ public class Route {
 	 * 					previous project into this project
 	 *********************************************************/
 	public int calculateRoute() {
-		
+		Log.i("ROUTE","calculateRoute - begin");
 		// verify required fields are not NULL
 		if((startNode == null) || (endNode == null) || (nodeList == null)) {
 			//System.out.println("startNode, endNode, or nodeList");
@@ -443,9 +452,9 @@ public class Route {
 //		System.out.println("\nstartNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
 //		System.out.println("endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
 //		System.out.println("nodeList.size() = " + nodeList.size());
-		Log.i("ROUTE", "startNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
-		Log.i("ROUTE", "endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
-		Log.i("ROUTE", "nodeList.size() = " + nodeList.size());
+//		Log.i("ROUTE", "startNode: " + startNode.getNodeID() + ", Building: " + startNode.getBuildingID() + ", Floor: " + startNode.getFloorID() + ", mapImg: " + startNode.getMapImg() + ", photoImg: " + startNode.getPhotoImg() + ", X: " + startNode.getX() + ", Y: " + startNode.getY());
+//		Log.i("ROUTE", "endNode: " + endNode.getNodeID() + ", Building: " + endNode.getBuildingID() + ", Floor: " + endNode.getFloorID() + ", mapImg: " + endNode.getMapImg() + ", photoImg: " + endNode.getPhotoImg() + ", X: " + endNode.getX() + ", Y: " + endNode.getY());
+//		Log.i("ROUTE", "nodeList.size() = " + nodeList.size());
 		
 		// verify startNode is NOT the same as endNode
 		if(startNode.getNodeID().equals(endNode.getNodeID())) {
@@ -485,6 +494,8 @@ public class Route {
 //		System.out.println("stairsOrElevator: " + stairsOrElevator);
 //		System.out.println("bIgnoreDeferredSetting: " + bIgnoreDeferredSetting);
 //		System.out.println("Initialization done");
+		Log.i("ROUTE", "startNode: " + startNode.getNodeID());
+		Log.i("ROUTE", "endNode: " + endNode.getNodeID());
 		Log.i("ROUTE", "verbose: " + verbose);
 		Log.i("ROUTE", "stairsOrElevator: " + stairsOrElevator);
 		Log.i("ROUTE", "bIgnoreDeferredSetting: " + bIgnoreDeferredSetting);
@@ -560,7 +571,8 @@ public class Route {
 			return 5;  // error, first routeStep != startLoc and last routeStep != endLoc
 		}
 		
-						
+		dbConn.close();
+		
 		myMetrics.getMetricsByID(routeID).setLoadedNodes(nodeList.size());
 		myMetrics.getMetricsByID(routeID).setEndTime();
 		return 0;
@@ -690,6 +702,7 @@ public class Route {
 		// initialize local variables
 		final int NEIGHBORS = DatabaseConstants.QUERY_NEIGHBORS;
 		final int BLDG_FLR = DatabaseConstants.QUERY_BLDG_FLR_BY_NODEID;
+		//Cursor cursor = null;
 		ArrayList<String> myResultsList = new ArrayList<String>();
 		ArrayList<Node> nodesToBeAdded = new ArrayList<Node>();
 		ArrayList<NodeNeighborMap> nodeNeighborList = new ArrayList<NodeNeighborMap>();
@@ -707,7 +720,7 @@ public class Route {
 //			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 //			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 //			
-//			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myNodeID);
+//			dbConn.getDataFromDatabase(NEIGHBORS, myID);
 //			
 //			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			
@@ -718,24 +731,24 @@ public class Route {
 				// obtaining data from database by nodeID is a very costly SQL query
 				// so we will first obtain buildingID, floorID that is associated  
 				// with nodeID from database
-				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
-				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
-				
-				myResultsList = dbConn.getDataFromDatabase(BLDG_FLR, myID);
-				
-				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
-				
-				// update myNodeID array to include buildingID and floorID
-				myID = myResultsList.get(0).split(",");
-				// myNodeID[0] = buildingID	
-				// myNodeID[1] = floorID
-				Log.i("ROUTE","bldgID: " + myID[0] + ", floorID: " + myID[1]);
-				
+//				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+//				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+//				
+//				dbConn.getDataFromDatabase(BLDG_FLR, myID);
+//				
+//				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+//				
+//				// update myNodeID array to include buildingID and floorID
+//				dbConn.getCursor().moveToFirst();
+//				myID = new String[2];		
+//				myID[0] = dbConn.getCursor().getString(0);	
+//				myID[1] = dbConn.getCursor().getString(1);
+								
 				// obtain data from database using buildingID and floorID (much faster SQL query)				
 				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 				
-				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				dbConn.getDataFromDatabase(NEIGHBORS, myID);
 				
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			} else {
@@ -743,7 +756,7 @@ public class Route {
 				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 				
-				myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				dbConn.getDataFromDatabase(NEIGHBORS, myID);
 				
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			}
@@ -758,71 +771,112 @@ public class Route {
 			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 			
-			myResultsList = dbConn.getDataFromDatabase(NEIGHBORS, myID);
+			dbConn.getDataFromDatabase(NEIGHBORS, myID);
 			
 			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			
 		}
 		Log.i("ROUTE","nodes obtained from database - next, load into java");
 		
-		if (myResultsList != null) {
-			if (myResultsList.size() > 0) {
+		if (dbConn.getCursor() != null) {
+//			if (dbConn.getCursor().getCount() > 0) {
 				// sort the results
 				//Collections.sort(myResultsList);
+			
+				String cursor_NodeID;	 				
+				//String cursor_nodeLabel;				
+				String cursor_typeName;					
+				//String cursor_photoImg;				
+				//int cursor_x;							
+				//int cursor_y;							
+				boolean cursor_isConnector;	
+				//boolean cursor_isPOI;			
+				//String cursor_poiIconImg;			
+				String cursor_buildingID;				
+				//String cursor_buildingName;			
+				String cursor_floorID;				
+				//int cursor_floorLevel;					
+				//String cursor_mapImg;				
+				String cursor_neighborNode;			
+				int cursor_distance;				
 				
 				// load all nodes on floor from resultList
-				for (int i = 0; i < myResultsList.size(); i++) {
-					// resultRow = neighborNode, nodeID, nodeLabel, distance, typeName, buildingID, floorID, flooeLevel, isConnector, mapImg, photoImg, x, y, isPOI, poiIconImg
-					fieldsList = myResultsList.get(i).split(",");
-					// fieldsList[0] = neighborNode	(nodeID of neighbor Node) - Note: this will be the ID of the Node object we load
-					// fieldsList[1] = nodeID  		(this should = myNode.getNodeID) - Note: this will be the ID of the Neighbor
-					// fieldsList[2] = nodeLabel	(nodeLabel of neighbor Node)
-					// fieldsList[3] = distance		(distance value for Neighbor)
-					// fieldsList[4] = typeName		(type of Node)
-					// fieldsList[5] = buildingID	(buildingID of Node)
-					// fieldsList[6] = floorID		(floorID of Node)
-					// fieldsList[7] = floorLevel	(numerical floor level of Node)
-					// fieldsList[8] = isConnector	(is neighbor Node a connector to other floors?)
-					// fieldsList[9] = mapImg		(floor mapImg of Node)
-					// fieldsList[10] = photoImg	(photoImg of Node)
-					// fieldsList[11] = x			(x coordinate of Node)
-					// fieldsList[12] = y			(y coordinate of Node)
-					// fieldsList[13] = isPOI		(is node a point of interest?)
-					// fieldsList[14] = poiIconImg	(icon image of point of interest)
+				long starttime = System.currentTimeMillis();				
+				while (dbConn.getCursor().moveToNext()) {
+					//Log.i("ROUTE","loading...");
+					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
+					//cursor_nodeLabel = dbConn.getCursor().getString(1);					// columnIndex 1 = nodeLabel
+					cursor_typeName = dbConn.getCursor().getString(1);					// columnIndex 2 = typeName
+					//cursor_photoImg = dbConn.getCursor().getString(3);					// columnIndex 3 = photoImg
+					//cursor_x = dbConn.getCursor().getInt(4);							// columnIndex 4 = x
+					//cursor_y = dbConn.getCursor().getInt(5);							// columnIndex 5 = y
+					cursor_isConnector = dbConn.getCursor().getString(2).equals("1");	// columnIndex 6 = isConnector
+					//cursor_isPOI = dbConn.getCursor().getString(7).equals("1");			// columnIndex 7 = isPOI
+					//cursor_poiIconImg = dbConn.getCursor().getString(8);				// columnIndex 8 = poiIconImg
+					cursor_buildingID = dbConn.getCursor().getString(3);				// columnIndex 9 = buildingID
+					//cursor_buildingName =dbConn.getCursor().getString(10);				// columnIndex 10 = buildingName
+					cursor_floorID = dbConn.getCursor().getString(4);					// columnIndex 11 = floorID
+					//cursor_floorLevel = dbConn.getCursor().getInt(12);					// columnIndex 12 = floorLevel
+					//cursor_mapImg = dbConn.getCursor().getString(13);					// columnIndex 13 = mapImg
+					cursor_neighborNode = dbConn.getCursor().getString(5);				// columnIndex 14 = neighborNode
+					cursor_distance = dbConn.getCursor().getInt(6);					// columnIndex 15 = distance
 					
 					// since resultList is sorted (SQL-side ORDER BY), we can skip duplicate Nodes
-					if (!lastNode.equals(fieldsList[0])) {
+					if (!lastNode.equals(cursor_NodeID)) {
 						// create the node to be added (note: nodeID is fieldList[0], NOT fieldList[1].  This is because the query results treat the neighbor as the full node object, and the nodeID as the ID of the neighbor (backwards, ya I know)
-						// nodeID, nodeLabel, buildingID, floorID, floorLevel, nodeType, isConnector, mapImg, photoImg, xCoordinate, yCoordinate, isPOI, poiIconImg
-						thisNode = new Node(fieldsList[0],fieldsList[2],fieldsList[5],fieldsList[6],Integer.parseInt(fieldsList[7]),fieldsList[4],fieldsList[8].equals("1"),fieldsList[9],fieldsList[10],Integer.parseInt(fieldsList[11]),Integer.parseInt(fieldsList[12]),fieldsList[13].equals("1"),fieldsList[14]);
+//						thisNode = new Node(cursor_NodeID,
+//											cursor_nodeLabel,
+//											cursor_buildingID,
+//											cursor_floorID,
+//											cursor_floorLevel,
+//											cursor_typeName,
+//											cursor_isConnector,
+//											cursor_mapImg,
+//											cursor_photoImg,
+//											cursor_x,
+//											cursor_y,
+//											cursor_isPOI,
+//											cursor_poiIconImg);
+						thisNode = new Node(cursor_NodeID,
+											null,	//nodeLabel					
+											cursor_buildingID,
+											cursor_floorID,
+											-1, 	//floorLevel
+											cursor_typeName,
+											cursor_isConnector,
+											null,	//mapImg
+											null,	//photoImg
+											-1,		//x
+											-1,		//y
+											false,	//isPOI
+											null);	//poiIconImg
 						
 						// if Node is not a connector, then add it
-						if (fieldsList[8].equals("0")) {
-							//thisNode = new Node(fieldsList[0],fieldsList[2],fieldsList[5],fieldsList[6],Integer.parseInt(fieldsList[7]),fieldsList[4],fieldsList[8].equals("1"),fieldsList[9],fieldsList[10],Integer.parseInt(fieldsList[11]),Integer.parseInt(fieldsList[12]),fieldsList[13].equals("1"),fieldsList[14]);
+						if (!cursor_isConnector) {
 							nodesToBeAdded.add(thisNode);
-							lastNode = fieldsList[0];
+							lastNode = cursor_NodeID;
 						} else {
 							// we need to check to see if the connector node already exists in nodeList
 							// TODO Node connNode = getNodeByID(fieldsList[0]);
-							if (getNodeByID(fieldsList[0]) == null) {
-								//thisNode = new Node(fieldsList[0],fieldsList[2],fieldsList[5],fieldsList[6],Integer.parseInt(fieldsList[7]),fieldsList[4],fieldsList[8].equals("1"),fieldsList[9],fieldsList[10],Integer.parseInt(fieldsList[11]),Integer.parseInt(fieldsList[12]),fieldsList[13].equals("1"),fieldsList[14]);
+							if (getNodeByID(cursor_NodeID) == null) {
 								nodesToBeAdded.add(thisNode);
-								lastNode = fieldsList[0];
+								lastNode = cursor_NodeID;
 							} else {
-								thisNode = getNodeByID(fieldsList[0]);
+								thisNode = getNodeByID(cursor_NodeID);
 							}
 						}
 					}
 					
 					// make sure myNode has a handle on the current dijkstra node
 					if (myNode == null) {
-						if (strNodeID.equals(fieldsList[0])) myNode = thisNode;
+						if (strNodeID.equals(cursor_NodeID)) myNode = thisNode;
 					}
 						
 					// add to node/neighbor temporary list
-					nodeNeighborList.add(new NodeNeighborMap(thisNode, fieldsList[1], Integer.parseInt(fieldsList[3])));
+					nodeNeighborList.add(new NodeNeighborMap(thisNode, cursor_neighborNode, cursor_distance));
 					
 				}
+				Log.i("MICRO","loaded nodes: " + (System.currentTimeMillis() - starttime) + " milliseconds");
 				
 				nodeList.addAll(nodesToBeAdded);
 				//Collections.sort(nodeList, nodeComparator);
@@ -839,7 +893,6 @@ public class Route {
 				// load Neighbor data from resultList
 				// for each node in nodeNeighborList, add it's neighbor
 				for (int i = 0; i < nodeNeighborList.size(); i++) {
-					
 					// only check Nodes that are on the same floor as myNode
 					if ((myNode.getBuildingID().equals(nodeNeighborList.get(i).node.getBuildingID())) && (myNode.getFloorID().equals(nodeNeighborList.get(i).node.getFloorID()))) {
 						
@@ -849,12 +902,14 @@ public class Route {
 							
 							nodeNeighborList.get(i).node.addNeighbor(neighborNode, nodeNeighborList.get(i).distance);
 						}
+						
 					}
+					
 				}
 				
-			} else {	// myNode's floor has no nodes / neighbors (shouldn't happen)
-				System.out.println("ERROR - generateFloorNodeNeighborData() generated an empty recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
-			}
+//			} else {	// myNode's floor has no nodes / neighbors (shouldn't happen)
+//				System.out.println("ERROR - generateFloorNodeNeighborData() generated an empty recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
+//			}
 		} else {  // myResultsList == null (shouldn't happen)
 			System.out.println("ERROR - generateFloorNodeNeighborData() generated an null recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
 		}
@@ -1149,9 +1204,33 @@ public class Route {
 		Node neighborNode = null;
 		Node currentNode = null;
 		
+		long startTime = System.currentTimeMillis();
+		
 		// begin with endNode
 		// create route step - add Node, direction text
-		addRouteStep(new RouteStep(endNode, "node: " + endNode.getNodeID(),-1));
+		Log.i("RSTEP","get route step info");
+		int d1 = -1;
+		String[] myID = new String[1];
+		myID[0] = endNode.getNodeID();
+		if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+		
+		dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
+		
+		if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+		
+		dbConn.getCursor().moveToFirst();
+		endNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
+		endNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
+		endNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
+		endNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
+		endNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
+		endNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
+		//endNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
+		endNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
+		endNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
+				
+		addRouteStep(new RouteStep(endNode, "node: " + endNode.getNodeID(),-1));	// we can't put this in the while loop because we need to hardcode the -1 value
 		
 		// find next step
 		neighborNode = endNode;
@@ -1160,6 +1239,25 @@ public class Route {
 		// add routeSteps
 		// if currPoint is null, we have reached the start location
 		while (currentNode != null) {
+			myID[0] = currentNode.getNodeID();
+			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
+			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
+			
+			dbConn.getDataFromDatabase(DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID, myID);
+			
+			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
+			
+			dbConn.getCursor().moveToFirst();
+			currentNode.setNodeLabel(dbConn.getCursor().getString(0));			// columnIndex 0 = nodeLabel
+			currentNode.setPhotoImg(dbConn.getCursor().getString(1));			// columnIndex 1 = photoImg
+			currentNode.setX(dbConn.getCursor().getInt(2));						// columnIndex 2 = x
+			currentNode.setY(dbConn.getCursor().getInt(3));						// columnIndex 3 = y
+			currentNode.setIsPOI(dbConn.getCursor().getString(4).equals("1"));	// columnIndex 4 = isPOI
+			currentNode.setPoiIconImg(dbConn.getCursor().getString(5));			// columnIndex 5 = poiIconImg
+			//currentNode.setNodeLabel(dbConn.getCursor().getString(6));		// columnIndex 6 = buildingName
+			currentNode.setFloorLevel(dbConn.getCursor().getInt(7));			// columnIndex 7 = floorLevel
+			currentNode.setMapImg(dbConn.getCursor().getString(8));				// columnIndex 8 = mapImg
+			
 			addRouteStep(new RouteStep(currentNode,"node: " + currentNode.getNodeID(), currentNode.getNeighborByNode(neighborNode).getDistance()));
 			neighborNode = currentNode;
 			currentNode = currentNode.getPredecessor();
@@ -1168,6 +1266,7 @@ public class Route {
 		// reverse the order of routeStepList, so starLoc is at beginning
 		Collections.reverse(routeStepList);
 		
+		Log.i("MICRO","createRouteStepList took: " + (System.currentTimeMillis() - startTime) + " milliseconds");
 	}
 	
 	private void determineDirectionalText() {

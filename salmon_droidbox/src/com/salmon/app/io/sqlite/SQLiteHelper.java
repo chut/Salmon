@@ -13,7 +13,7 @@ import android.util.Log;
 public class SQLiteHelper extends SQLiteOpenHelper{
 
 	private static SQLiteHelper mInstance = null;
-	private ArrayList<String> tabledata;
+	private ArrayList<String> tabledata = null;
 	
 	public static SQLiteHelper getInstanstance(Context context) {
 		if (mInstance == null) {
@@ -35,7 +35,7 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 	private SQLiteHelper(Context context) {
 		super(context, DatabaseConstants.DATABASE_NAME, null, DatabaseConstants.DATABASE_VERSION);
 		
-		this.tabledata = null;
+		//this.tabledata = null;
 	}
 
 //	private SQLiteHelper(Context context, ArrayList<String> tabledata) {
