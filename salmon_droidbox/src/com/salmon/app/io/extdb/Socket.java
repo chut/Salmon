@@ -1,12 +1,17 @@
 package com.salmon.app.io.extdb;
 
-import android.database.Cursor;
+import java.util.ArrayList;
 
 import com.salmon.app.io.IDatabaseProvider;
 
 public class Socket implements IDatabaseProvider{
 
-	public Cursor getDataFromDatabase(int queryType,	String[] strValue) {
+	public IDatabaseProvider submitQuery(int queryType, String[] strValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ArrayList<String> getData() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -14,11 +19,6 @@ public class Socket implements IDatabaseProvider{
 	public void close() {
 		// TODO Auto-generated method stub
 		
-	}
-
-	public Cursor getCursor() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

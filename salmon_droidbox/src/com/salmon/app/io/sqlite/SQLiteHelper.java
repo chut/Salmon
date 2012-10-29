@@ -66,40 +66,40 @@ public class SQLiteHelper extends SQLiteOpenHelper{
 			for (String record : tabledata) {
 				fields = record.split(",");
 				// fields[0] = nodeID		
-				// fields[1] = neighborNode	
-				// fields[2] = nodeLabel	
-				// fields[3] = distance		
-				// fields[4] = typeName		
-				// fields[5] = buildingID	
-				// fields[6] = floorID		
-				// fields[7] = floorLevel	
-				// fields[8] = isConnector	
-				// fields[9] = mapImg		
-				// fields[10] = photoImg	
-				// fields[11] = x			
-				// fields[12] = y			
-				// fields[13] = isPOI		
-				// fields[14] = poiIconImg	
-				// fields[15] = buildingName
+				// fields[1] = nodeLabel	
+				// fields[2] = typeName		
+				// fields[3] = photoImg	
+				// fields[4] = x			
+				// fields[5] = y			
+				// fields[6] = isConnector	
+				// fields[7] = isPOI		
+				// fields[8] = poiIconImg	
+				// fields[9] = buildingID	
+				// fields[10] = buildingName
+				// fields[11] = floorID		
+				// fields[12] = floorLevel	
+				// fields[13] = mapImg		
+				// fields[14] = neighborNode	
+				// fields[15] = distance		
 				
 				//insert record row
 		        values.clear();
 		        values.put(DatabaseConstants.KEY_NODE_ID, fields[0]);
-		        values.put(DatabaseConstants.KEY_NODE_LABEL, fields[2]);
-		        values.put(DatabaseConstants.KEY_NODE_TYPE, fields[4]);
-		        values.put(DatabaseConstants.KEY_NODE_PHOTO, fields[10]);
-		        values.put(DatabaseConstants.KEY_NODE_X, Integer.parseInt(fields[11]));//
-		        values.put(DatabaseConstants.KEY_NODE_Y, Integer.parseInt(fields[12]));//
-		        values.put(DatabaseConstants.KEY_NODE_IS_CONNECTOR, Integer.parseInt(fields[8]));//
-		        values.put(DatabaseConstants.KEY_NODE_IS_POI, Integer.parseInt(fields[13]));//
-		        values.put(DatabaseConstants.KEY_NODE_POI_Img, fields[14]);
-		        values.put(DatabaseConstants.KEY_BUILDING_ID, fields[5]);
-		        values.put(DatabaseConstants.KEY_BUILDING_NAME, fields[15]);
-		        values.put(DatabaseConstants.KEY_FLOOR_ID, fields[6]);
-		        values.put(DatabaseConstants.KEY_FLOOR_LEVEL, Integer.parseInt(fields[7]));//
-		        values.put(DatabaseConstants.KEY_FLOOR_MAP, fields[9]);
-		        values.put(DatabaseConstants.KEY_NEIGHBOR_NODE, fields[1]);
-		        values.put(DatabaseConstants.KEY_NEIGHBOR_DISTANCE, Integer.parseInt(fields[3]));//
+		        values.put(DatabaseConstants.KEY_NODE_LABEL, fields[1]);
+		        values.put(DatabaseConstants.KEY_NODE_TYPE, fields[2]);
+		        values.put(DatabaseConstants.KEY_NODE_PHOTO, fields[3]);
+		        values.put(DatabaseConstants.KEY_NODE_X, Integer.parseInt(fields[4]));//
+		        values.put(DatabaseConstants.KEY_NODE_Y, Integer.parseInt(fields[5]));//
+		        values.put(DatabaseConstants.KEY_NODE_IS_CONNECTOR, Integer.parseInt(fields[6]));//
+		        values.put(DatabaseConstants.KEY_NODE_IS_POI, Integer.parseInt(fields[7]));//
+		        values.put(DatabaseConstants.KEY_NODE_POI_Img, fields[8]);
+		        values.put(DatabaseConstants.KEY_BUILDING_ID, fields[9]);
+		        values.put(DatabaseConstants.KEY_BUILDING_NAME, fields[10]);
+		        values.put(DatabaseConstants.KEY_FLOOR_ID, fields[11]);
+		        values.put(DatabaseConstants.KEY_FLOOR_LEVEL, Integer.parseInt(fields[12]));//
+		        values.put(DatabaseConstants.KEY_FLOOR_MAP, fields[13]);
+		        values.put(DatabaseConstants.KEY_NEIGHBOR_NODE, fields[14]);
+		        values.put(DatabaseConstants.KEY_NEIGHBOR_DISTANCE, Integer.parseInt(fields[15]));//
 		        
 		        db.insert(DatabaseConstants.TABLE_NAME, null, values);
 			}

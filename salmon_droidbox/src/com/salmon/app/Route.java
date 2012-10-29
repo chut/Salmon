@@ -689,11 +689,14 @@ public class Route {
 	 *********************************************************/
 	public Node loadFloorNodeNeighborData(Node myNode, String ... myID) {
 		Log.i("ROUTE","loadFloorNodeNeighborData - begin");
+		//long methodStart = System.currentTimeMillis();
+		
 		// initialize local variables
+		long starttime = 0;
 		final int NEIGHBORS = DatabaseConstants.QUERY_NEIGHBORS;
 		final int BLDG_FLR = DatabaseConstants.QUERY_BLDG_FLR_BY_NODEID;
 		//Cursor cursor = null;
-		ArrayList<String> myResultsList = new ArrayList<String>();
+		final ArrayList<String> myResultsList = new ArrayList<String>();
 		ArrayList<Node> nodesToBeAdded = new ArrayList<Node>();
 		ArrayList<NodeNeighborMap> nodeNeighborList = new ArrayList<NodeNeighborMap>();
 		String[] fieldsList = null;
@@ -738,7 +741,7 @@ public class Route {
 				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 				
-				dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				myResultsList.addAll(dbConn.submitQuery(NEIGHBORS, myID).getData());
 				
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			} else {
@@ -746,7 +749,7 @@ public class Route {
 				if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 				
-				dbConn.getDataFromDatabase(NEIGHBORS, myID);
+				myResultsList.addAll(dbConn.submitQuery(NEIGHBORS, myID).getData());
 				
 				if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			}
@@ -761,18 +764,21 @@ public class Route {
 			if (myMetrics != null) {d1 = myMetrics.getMetricsByID(routeID).addDatabaseCall();}
 			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setStartTime();}
 			
-			dbConn.getDataFromDatabase(NEIGHBORS, myID);
+			myResultsList.addAll(dbConn.submitQuery(NEIGHBORS, myID).getData());
 			
 			if (myMetrics != null) {myMetrics.getMetricsByID(routeID).getDatabaseCalls().get(d1).setEndTime();}
 			
 		}
 		Log.i("ROUTE","nodes obtained from database - next, load into java");
+		//Log.i("ROUTE","myResultsList.size: " + myResultsList.size());
 		
-		if (dbConn.getCursor() != null) {
+//		if (dbConn.getCursor() != null) {
 //			if (dbConn.getCursor().getCount() > 0) {
+		//if (myResultsList != null) {
+			if (myResultsList.size() > 0) {
 				// sort the results
 				//Collections.sort(myResultsList);
-			
+				
 				String cursor_NodeID;	 				
 				String cursor_nodeLabel;				
 				String cursor_typeName;					
@@ -791,25 +797,27 @@ public class Route {
 				int cursor_distance;				
 				
 				// load all nodes on floor from resultList
-				long starttime = System.currentTimeMillis();				
-				while (dbConn.getCursor().moveToNext()) {
+				starttime = System.currentTimeMillis();				
+//				while (dbConn.getCursor().moveToNext()) {
+				for (int i = 0; i < myResultsList.size(); i++) {
+					
 					//Log.i("ROUTE","loading...");
-					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
-					cursor_nodeLabel = dbConn.getCursor().getString(1);					// columnIndex 1 = nodeLabel
-					cursor_typeName = dbConn.getCursor().getString(2);					// columnIndex 2 = typeName
-					cursor_photoImg = dbConn.getCursor().getString(3);					// columnIndex 3 = photoImg
-					cursor_x = dbConn.getCursor().getInt(4);							// columnIndex 4 = x
-					cursor_y = dbConn.getCursor().getInt(5);							// columnIndex 5 = y
-					cursor_isConnector = dbConn.getCursor().getString(6).equals("1");	// columnIndex 6 = isConnector
-					cursor_isPOI = dbConn.getCursor().getString(7).equals("1");			// columnIndex 7 = isPOI
-					cursor_poiIconImg = dbConn.getCursor().getString(8);				// columnIndex 8 = poiIconImg
-					cursor_buildingID = dbConn.getCursor().getString(9);				// columnIndex 9 = buildingID
-					//cursor_buildingName =dbConn.getCursor().getString(10);				// columnIndex 10 = buildingName
-					cursor_floorID = dbConn.getCursor().getString(11);					// columnIndex 11 = floorID
-					cursor_floorLevel = dbConn.getCursor().getInt(12);					// columnIndex 12 = floorLevel
-					cursor_mapImg = dbConn.getCursor().getString(13);					// columnIndex 13 = mapImg
-					cursor_neighborNode = dbConn.getCursor().getString(14);				// columnIndex 14 = neighborNode
-					cursor_distance = dbConn.getCursor().getInt(15);					// columnIndex 15 = distance
+//					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
+//					cursor_nodeLabel = dbConn.getCursor().getString(1);					// columnIndex 1 = nodeLabel
+//					cursor_typeName = dbConn.getCursor().getString(2);					// columnIndex 2 = typeName
+//					cursor_photoImg = dbConn.getCursor().getString(3);					// columnIndex 3 = photoImg
+//					cursor_x = dbConn.getCursor().getInt(4);							// columnIndex 4 = x
+//					cursor_y = dbConn.getCursor().getInt(5);							// columnIndex 5 = y
+//					cursor_isConnector = dbConn.getCursor().getString(6).equals("1");	// columnIndex 6 = isConnector
+//					cursor_isPOI = dbConn.getCursor().getString(7).equals("1");			// columnIndex 7 = isPOI
+//					cursor_poiIconImg = dbConn.getCursor().getString(8);				// columnIndex 8 = poiIconImg
+//					cursor_buildingID = dbConn.getCursor().getString(9);				// columnIndex 9 = buildingID
+//					//cursor_buildingName =dbConn.getCursor().getString(10);				// columnIndex 10 = buildingName
+//					cursor_floorID = dbConn.getCursor().getString(11);					// columnIndex 11 = floorID
+//					cursor_floorLevel = dbConn.getCursor().getInt(12);					// columnIndex 12 = floorLevel
+//					cursor_mapImg = dbConn.getCursor().getString(13);					// columnIndex 13 = mapImg
+//					cursor_neighborNode = dbConn.getCursor().getString(14);				// columnIndex 14 = neighborNode
+//					cursor_distance = dbConn.getCursor().getInt(15);					// columnIndex 15 = distance
 					
 //					cursor_NodeID = dbConn.getCursor().getString(0);	 				// columnIndex 0 = nodeID
 //					cursor_typeName = dbConn.getCursor().getString(1);					// columnIndex 1 = typeName
@@ -819,6 +827,27 @@ public class Route {
 //					cursor_neighborNode = dbConn.getCursor().getString(5);				// columnIndex 5 = neighborNode
 //					cursor_distance = dbConn.getCursor().getInt(6);						// columnIndex 6 = distance
 					
+					//Log.i("ROUTE","before split: " + myResultsList.get(i));
+					fieldsList = myResultsList.get(i).split(",");
+					cursor_NodeID = fieldsList[0];	 									// columnIndex 0 = nodeID
+					cursor_nodeLabel = fieldsList[1];									// columnIndex 1 = nodeLabel
+					cursor_typeName = fieldsList[2];									// columnIndex 2 = typeName
+					cursor_photoImg = fieldsList[3];									// columnIndex 3 = photoImg
+					cursor_x = Integer.parseInt(fieldsList[4]);							// columnIndex 4 = x
+					cursor_y = Integer.parseInt(fieldsList[5]);							// columnIndex 5 = y
+					cursor_isConnector = fieldsList[6].equals("1");						// columnIndex 6 = isConnector
+					cursor_isPOI = fieldsList[7].equals("1");							// columnIndex 7 = isPOI
+					cursor_poiIconImg = fieldsList[8];									// columnIndex 8 = poiIconImg
+					cursor_buildingID = fieldsList[9];									// columnIndex 9 = buildingID
+					//cursor_buildingName = fieldsList[10];								// columnIndex 10 = buildingName
+					cursor_floorID = fieldsList[11];									// columnIndex 11 = floorID
+					cursor_floorLevel = Integer.parseInt(fieldsList[12]);				// columnIndex 12 = floorLevel
+					cursor_mapImg = fieldsList[13];										// columnIndex 13 = mapImg
+					cursor_neighborNode = fieldsList[14];								// columnIndex 14 = neighborNode
+					cursor_distance = Integer.parseInt(fieldsList[15]);					// columnIndex 15 = distance
+					
+					// TODO fix - ext database columnIndexes will be different
+				
 					// since resultList is sorted (SQL-side ORDER BY), we can skip duplicate Nodes
 					if (!lastNode.equals(cursor_NodeID)) {
 						// create the node to be added (note: nodeID is fieldList[0], NOT fieldList[1].  This is because the query results treat the neighbor as the full node object, and the nodeID as the ID of the neighbor (backwards, ya I know)
@@ -905,13 +934,14 @@ public class Route {
 					
 				}
 				
-//			} else {	// myNode's floor has no nodes / neighbors (shouldn't happen)
-//				System.out.println("ERROR - generateFloorNodeNeighborData() generated an empty recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
-//			}
-		} else {  // myResultsList == null (shouldn't happen)
-			System.out.println("ERROR - generateFloorNodeNeighborData() generated an null recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
-		}
+			} else {	// myNode's floor has no nodes / neighbors (shouldn't happen)
+				System.out.println("ERROR - generateFloorNodeNeighborData() generated an empty recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
+			}
+//		} else {  // myResultsList == null (shouldn't happen)
+//			System.out.println("ERROR - generateFloorNodeNeighborData() generated an null recordSet for Node: " + myNode.getNodeID() + ", Bldg: " + myNode.getBuildingID() + ", Floor: " + myNode.getFloorID());
+//		}
 		
+		//Log.i("MICRO","load: " + (System.currentTimeMillis() - methodStart));
 		return myNode;
 	}
 	

@@ -18,13 +18,15 @@ import com.salmon.app.io.IDatabaseProvider;
 
 public class HTTP_Apache implements IDatabaseProvider {
 	
+	private final ArrayList<String> resultArray = new ArrayList<String>();
+	
 	public HTTP_Apache() {
 		
 	}
 	
-	public Cursor getDataFromDatabase(int queryType, String[] strValue) {
+	public HTTP_Apache submitQuery(int queryType, String[] strValue) {
 		//System.out.println("getDataFromDatabase - strSQL = " + strSQL);
-		ArrayList<String> resultArray = new ArrayList<String>();
+		//ArrayList<String> resultArray = new ArrayList<String>();
 		
 		HttpClient httpclient = null;
 		HttpGet httpget = null;
@@ -55,7 +57,7 @@ public class HTTP_Apache implements IDatabaseProvider {
 			
 			break;	
 		default:
-			return null;
+			return this;
 		}
 		
 		System.out.println("url: " + url);
@@ -109,7 +111,7 @@ public class HTTP_Apache implements IDatabaseProvider {
 				System.out.println("resultArray.size: " + resultArray.size());
 				//return resultArray;
 				// TODO fix this!!!!!
-				return null;
+				return this;
 			}
 
 			
@@ -135,8 +137,8 @@ public class HTTP_Apache implements IDatabaseProvider {
 		
 	}
 
-	public Cursor getCursor() {
+	public ArrayList<String> getData() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.resultArray;
 	}
 }

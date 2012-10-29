@@ -1,5 +1,7 @@
 package com.salmon.app.io.sqlite;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -18,6 +20,7 @@ public class SQLite implements IDatabaseProvider {
 	private Context context;
 	private SQLiteDatabase db = null;
 	private Cursor cursor = null;
+	private final ArrayList<String> results = new ArrayList<String>();
 	
 	public static SQLite getInstance(Context context) {
 		if (mInstance == null) {
@@ -42,8 +45,8 @@ public class SQLite implements IDatabaseProvider {
 //        }
 	}
 	
-	public Cursor getCursor() {
-		return this.cursor;
+	public ArrayList<String> getData() {
+		return this.results;
 	}
 	
 	public void close() {
@@ -53,14 +56,16 @@ public class SQLite implements IDatabaseProvider {
 		this.db = null;
 	}
 	
-	public Cursor getDataFromDatabase(int queryType,	String[] params) {
+	public SQLite submitQuery(int queryType, String[] params) {
 		//Log.i("SQLITE","getDataFromDatabase - begin");
 		//final ArrayList<String> results = new ArrayList<String>();
 		this.params = params;
+		this.results.clear();
 		
 		switch (queryType) {
 		case DatabaseConstants.QUERY_SYNC_DB:
-			return query_SynchDB();
+			query_SynchDB();
+			return this;
 			
 //		case SQLiteConstants.QUERY_LOAD_APP:	// used with splash screen
 //			results.addAll(query_SynchDB());
@@ -69,28 +74,36 @@ public class SQLite implements IDatabaseProvider {
 //			handlerUI.post((Runnable) element1);			
 //			return results;
 		case DatabaseConstants.QUERY_ALLDATA:
-			return query_AllData();
+			query_AllData();
+			return this;
 			
 		case DatabaseConstants.QUERY_NODES_ALL:
-			return query_NodesAll();
+			query_NodesAll();
+			return this;
 			
 		case DatabaseConstants.QUERY_NODES_BY_FLOOR:
-			return query_NodesByFloor();
+			query_NodesByFloor();
+			return this;
 			
 		case DatabaseConstants.QUERY_NODES_BY_TYPE:
-			return query_NodesByType();
+			query_NodesByType();
+			return this;
 			
 		case DatabaseConstants.QUERY_DISPLAY_ALLDATA:
-			return query_DisplayAllData();
+			query_DisplayAllData();
+			return this;
 			
 		case DatabaseConstants.QUERY_NEIGHBORS:
-			return query_Neighbors();
+			query_Neighbors();
+			return this;
 			
 		case DatabaseConstants.QUERY_BLDG_FLR_BY_NODEID:
-			return query_BldgFloor();
+			query_BldgFloor();
+			return this;
 		
 		case DatabaseConstants.QUERY_ROUTESTEP_BY_NODEID:
-			return query_RoutStepInfo();
+			query_RoutStepInfo();
+			return this;
 		
 		default:
 			// an unknown querytype has been passed, fail.
@@ -115,7 +128,7 @@ public class SQLite implements IDatabaseProvider {
 		
 	}
 		
-	private Cursor query_SynchDB () {
+	private boolean query_SynchDB () {
 		Log.i("SQLITE", "sync db");
 		
 		//SQLiteDatabase db = null;
@@ -132,11 +145,11 @@ public class SQLite implements IDatabaseProvider {
 		} catch (Exception e) {
 			// TODO error handling of dbTask failure
 			//results.add(DatabaseConstants.RESULT_FAILED);
-        	return null;
+        	return false;
 		}
 		
 		// open/create the SQLite database 
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 		//if (this.future == null || !this.future.isCancelled()) {
 			try {
 				//db = sqliteHelper.getWritableDatabase();
@@ -149,7 +162,7 @@ public class SQLite implements IDatabaseProvider {
 	        	//if (db != null) {db.close();}
 	        	close();
 	        	//results.add(DatabaseConstants.RESULT_FAILED);
-	        	return null;
+	        	return false;
 	        }
 		//}
 		
@@ -161,13 +174,13 @@ public class SQLite implements IDatabaseProvider {
 //		if (this.future == null || !this.future.isCancelled()) {
 			//results.add(DatabaseConstants.RESULT_SUCCESS);
 			Log.i("SQLITE","sync success");
-	    	return this.cursor;
+	    	return true;
 //		} else {
 //			return null;
 //		}
 	}
 	
-	private Cursor query_AllData() {
+	private boolean query_AllData() {
 		Log.i("SQLITE", "all data");
 		
 		//SQLiteDatabase db = null;
@@ -175,7 +188,7 @@ public class SQLite implements IDatabaseProvider {
 		//final ArrayList<String> results = new ArrayList<String>();
 		
 		// open the SQLite database
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 //		try {
 //			db = sqliteHelper.getWritableDatabase();
 //        } catch(SQLException e) { 
@@ -197,6 +210,20 @@ public class SQLite implements IDatabaseProvider {
 			);
         
         // create a comma delimited ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 16;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(128);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
 		//if (this.future == null || !this.future.isCancelled()) {
 //			while (cursor.moveToNext()) {
 //	        	results.add(""
@@ -219,25 +246,27 @@ public class SQLite implements IDatabaseProvider {
 //			}
 		//}
 		
+		
+		
 		// close the database connection, and return results
 		//if (cursor != null) {cursor.close();}
 		//if (db != null) {db.close();}
 		
 //		if (this.future == null || !this.future.isCancelled()) {
-			Log.i("SQLITE","AllData - cursor.size: " + this.cursor.getCount());
-			return this.cursor;
+			Log.i("SQLITE","AllData - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}
 	}
 	
-	private Cursor query_NodesAll() {
+	private boolean query_NodesAll() {
 		//SQLiteDatabase db = null;
 		//Cursor cursor = null;
 		//final ArrayList<String> results = new ArrayList<String>();
 		
 		// open the SQLite database
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 //		try {
 //			db = sqliteHelper.getWritableDatabase();
 //        } catch(SQLException e) { 
@@ -261,6 +290,20 @@ public class SQLite implements IDatabaseProvider {
 			);
         
         // create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 2;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(32);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
 		//if (this.future == null || !this.future.isCancelled()) {
 //			while (cursor.moveToNext()) {
 //				results.add(""
@@ -274,20 +317,20 @@ public class SQLite implements IDatabaseProvider {
 		//if (db != null) {db.close();}
 		
 //		if (this.future == null || !this.future.isCancelled()) {
-			Log.i("SQLITE","query_NodesAll - cursor.size: " + this.cursor.getCount());
-			return this.cursor;
+			Log.i("SQLITE","query_NodesAll - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}
 	}
 	
-	private Cursor query_NodesByFloor() {
+	private boolean query_NodesByFloor() {
 		//SQLiteDatabase db = null;
 		//Cursor cursor = null;
 		//final ArrayList<String> results = new ArrayList<String>();
 		
 		// open the SQLite database
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 //		try {
 //			db = sqliteHelper.getWritableDatabase();
 //        } catch(SQLException e) { 
@@ -311,6 +354,20 @@ public class SQLite implements IDatabaseProvider {
 			);
         
         // create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 2;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(32);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
 		//if (this.future == null || !this.future.isCancelled()) {
 //			while (cursor.moveToNext()) {
 //				results.add(""
@@ -324,20 +381,20 @@ public class SQLite implements IDatabaseProvider {
 		//if (db != null) {db.close();}
 		
 //		if (this.future == null || !this.future.isCancelled()) {
-			Log.i("SQLITE","query_NodesByFloor - cursor.size: " + this.cursor.getCount());
-			return this.cursor;
+			Log.i("SQLITE","query_NodesByFloor - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}
 	}
 	
-	private Cursor query_NodesByType() {
+	private boolean query_NodesByType() {
 		//SQLiteDatabase db = null;
 		//Cursor cursor = null;
 		//final ArrayList<String> results = new ArrayList<String>();
 		
 		// open the SQLite database
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 //		try {
 //			db = sqliteHelper.getWritableDatabase();
 //        } catch(SQLException e) { 
@@ -361,6 +418,20 @@ public class SQLite implements IDatabaseProvider {
 			);
         
         // create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 2;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(32);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
 		//if (this.future == null || !this.future.isCancelled()) {
 //			while (cursor.moveToNext()) {
 //				results.add(""
@@ -374,32 +445,32 @@ public class SQLite implements IDatabaseProvider {
 		//if (db != null) {db.close();}
 		
 //		if (this.future == null || !this.future.isCancelled()) {
-			Log.i("SQLITE","query_NodesByType - results.size: " + this.cursor.getCount());
-			return this.cursor;
+			Log.i("SQLITE","query_NodesByType - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}
 	}
 
-	private Cursor query_DisplayAllData() {
+	private boolean query_DisplayAllData() {
 		//final ArrayList<String> results = new ArrayList<String>();
 		//Cursor cursor = null;
 		
 		// first, synch database
-		this.cursor = query_SynchDB();
-		
 		// second, get all data
 		//if (this.future == null || !this.future.isCancelled()) {
-			if (this.cursor != null) {
+			if (query_SynchDB()) {
 				this.cursor.close();
-				this.cursor = query_AllData();
+				return query_AllData();
 			}
 		//}
-		Log.i("SQLITE","query_DisplayAllData - cursor.size: " + this.cursor.getCount());
-		return this.cursor;
+			
+		return false;
+//		Log.i("SQLITE","query_DisplayAllData - results.size: " + this.results.size());
+//		return this.cursor;
 	}
 	
-	private Cursor query_Neighbors() {
+	private boolean query_Neighbors() {
 		//long methodStart = System.currentTimeMillis();
 		//long startTime = System.currentTimeMillis();
 		Log.i("SQLITE", "query_Neighbors - begin");
@@ -408,7 +479,7 @@ public class SQLite implements IDatabaseProvider {
 		//Log.i("MICRO","part 1: " + (System.currentTimeMillis() - startTime));
 		// open the SQLite database
 		//startTime = System.currentTimeMillis();
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 		//Log.i("MICRO","open db took: " + (System.currentTimeMillis() - startTime) + " milliseconds");
 		
 		// construct SQL statements
@@ -447,18 +518,36 @@ public class SQLite implements IDatabaseProvider {
 		//startTime = System.currentTimeMillis();
 		this.cursor = this.db.rawQuery(sbSQL.toString(), null);
 		//Log.i("MICRO","get cursor data took: " + (System.currentTimeMillis() - startTime) + " milliseconds");
-				
+		
+		//Log.i("SQLITE","cursor: " + cursor.getColumnCount());
+		// create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 16;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(128);
+				for (int i = 0; i < numCols; i++) {
+					//Log.i("SQLITE",i + ": " + this.cursor.getString(i));
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
+		
 //		if (this.future == null || !this.future.isCancelled()) {
-			//Log.i("SQLITE","query_Neighbors - cursor.size: " + this.cursor.getCount());
+			//Log.i("SQLITE","query_Neighbors - results.size: " + this.results.size());
 			//Log.i("MICRO","query_Neighbors: " + (System.currentTimeMillis() - methodStart));
-			return this.cursor;
+			return true;
 //		} else {
 //			return null;
 //		}
 
 	}
 	
-	private Cursor query_BldgFloor() {
+	private boolean query_BldgFloor() {
 		Log.i("SQLITE", "query_BldgFloor - begin");
 		
 		// for testing
@@ -468,7 +557,7 @@ public class SQLite implements IDatabaseProvider {
 		
 		// open the SQLite database
 		//startTime = System.currentTimeMillis();
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 		//Log.i("SQLITE","Database open");
 		//endTime = System.currentTimeMillis();
 		//Log.i("MICRO","open db took: " + (endTime - startTime) + " milliseconds");
@@ -490,18 +579,33 @@ public class SQLite implements IDatabaseProvider {
 		//endTime = System.currentTimeMillis();
 		//Log.i("MICRO","get cursor data took: " + (endTime - startTime) + " milliseconds");
 		
-
+		// create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 2;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(32);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
+		
 //		if (this.future == null || !this.future.isCancelled()) {
 		
-			//Log.i("SQLITE","query_BldgFloor - cursor.size: " + this.cursor.getCount());
-			return this.cursor;
+			//Log.i("SQLITE","query_BldgFloor - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}
 		        
 	}
 	
-	private Cursor query_RoutStepInfo() {
+	private boolean query_RoutStepInfo() {
 		//Log.i("SQLITE", "query_RoutStepInfo - begin");
 		
 		// for testing
@@ -511,7 +615,7 @@ public class SQLite implements IDatabaseProvider {
 		
 		// open the SQLite database
 		//startTime = System.currentTimeMillis();
-		if (!openDatabaseConnection()) {return null;}
+		if (!openDatabaseConnection()) {return false;}
 		//Log.i("SQLITE","Database open");
 		//endTime = System.currentTimeMillis();
 		//Log.i("MICRO","open db took: " + (endTime - startTime) + " milliseconds");
@@ -530,11 +634,26 @@ public class SQLite implements IDatabaseProvider {
 		//endTime = System.currentTimeMillis();
 		//Log.i("MICRO","get cursor data took: " + (endTime - startTime) + " milliseconds");
 		
+		// create an ArrayList<String> from cursor results
+		if (this.cursor != null) {
+			final int numCols = 9;
+			StringBuilder sbRow;
+			while (this.cursor.moveToNext()) {
+				sbRow = new StringBuilder(64);
+				for (int i = 0; i < numCols; i++) {
+					sbRow.append(this.cursor.getString(i)).append(",");
+				}
+				this.results.add(sbRow.toString());
+	        	sbRow = null;
+			}
+		} else {
+			this.results.add(DatabaseConstants.RESULT_FAILED);
+		}
 
 //		if (this.future == null || !this.future.isCancelled()) {
 		
-			//Log.i("SQLITE","query_BldgFloor - cursor.size: " + this.cursor.getCount());
-			return this.cursor;
+			//Log.i("SQLITE","query_BldgFloor - results.size: " + this.results.size());
+			return true;
 //		} else {
 //			return null;
 //		}

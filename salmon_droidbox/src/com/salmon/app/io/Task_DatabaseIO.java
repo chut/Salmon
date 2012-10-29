@@ -109,24 +109,25 @@ public class Task_DatabaseIO<E1, E2> extends TaskBase<ArrayList<String>, E1, E2>
 //			break;
 //		default:
 			//results.addAll(dbConn.getDataFromDatabase(querytype, params));
-			Cursor cursor = dbConn.getDataFromDatabase(querytype, params);
+			results.addAll(dbConn.submitQuery(querytype, params).getData());
+			dbConn.close();
 			
-			if (cursor != null) {
-				final int numCols = cursor.getColumnCount() - 1;
-				StringBuilder sbRow;
-				while (cursor.moveToNext()) {
-					sbRow = new StringBuilder(128);
-					for (int i = 0; i < numCols; i++) {
-						sbRow.append(cursor.getString(i)).append(",");
-					}
-					results.add(sbRow.toString());
-		        	sbRow = null;
-				}
-				cursor.close();
-				dbConn.close();
-			} else {
-				results.add(DatabaseConstants.RESULT_FAILED);
-			}
+//			if (cursor != null) {
+//				final int numCols = cursor.getColumnCount() - 1;
+//				StringBuilder sbRow;
+//				while (cursor.moveToNext()) {
+//					sbRow = new StringBuilder(128);
+//					for (int i = 0; i < numCols; i++) {
+//						sbRow.append(cursor.getString(i)).append(",");
+//					}
+//					results.add(sbRow.toString());
+//		        	sbRow = null;
+//				}
+//				cursor.close();
+//				dbConn.close();
+//			} else {
+//				results.add(DatabaseConstants.RESULT_FAILED);
+//			}
 //			break;
 //		}
 		
