@@ -634,10 +634,14 @@ public class Route {
 			if (inSettled == -1) {
 				//System.out.println("   " + n1.getNode().getNodeID()	+ " is not in settledBucket");
 				// if a shorter distance exists to neighbor
-				if (myNode.getNeighborList().get(i).getNode().getShortestDist() > (myNode.getShortestDist() + myNode.getNeighborList().get(i).getDistance())) {
+				int neighborDistance = calculateDistance(myNode.getX(), myNode.getNeighborList().get(i).getNode().getX(), myNode.getY(), myNode.getNeighborList().get(i).getNode().getY());
+				myNode.getNeighborList().get(i).setDistance(neighborDistance);
+				//Log.i("ROUTE","Node: " + myNode.getNodeID() + ", Neighbor: " + myNode.getNeighborList().get(i).getNodeID() + ", distance: " + neighborDistance);
+				if (myNode.getNeighborList().get(i).getNode().getShortestDist() > (myNode.getShortestDist() + neighborDistance)) {
+				//if (myNode.getNeighborList().get(i).getNode().getShortestDist() > (myNode.getShortestDist() + myNode.getNeighborList().get(i).getDistance())) {
 
 					// set the new shortestDist to neighbor
-					myNode.getNeighborList().get(i).getNode().setShortestDist((myNode.getShortestDist() + myNode.getNeighborList().get(i).getDistance()));
+					myNode.getNeighborList().get(i).getNode().setShortestDist((myNode.getShortestDist() + neighborDistance));
 					
 					// set the new predecessor of neighbor to currPoint (myNode)
 					myNode.getNeighborList().get(i).getNode().setPredecessor(myNode);
@@ -1333,8 +1337,8 @@ public class Route {
 		// check all steps (other than 1st and last) to see if it should be set to false
 		for (int i = 1; i < (routeStepList.size() - 1); i++) {
 			
-			// if current step and next step == hall nodetype, and directional text == "go straight", then set isNavPoint = false
-			if (routeStepList.get(i).getStepNode().getNodeType().equals("hall") && (routeStepList.get(i+1).getStepNode().getNodeType().equals("hall") || routeStepList.get(i+1).getStepNode().getNodeType().equals("hall_intersection")) && routeStepList.get(i).getDirectionalText().equals("go straight")) {
+			// if current step == hall/path, and next step is a hall/path or intersection, and previous step is hall/path or intersection --> then set isNavPoint = false
+			if ((routeStepList.get(i).getStepNode().getNodeType().equals("hall") || routeStepList.get(i).getStepNode().getNodeType().equals("path")) && ((routeStepList.get(i+1).getStepNode().getNodeType().equals("hall")) || routeStepList.get(i+1).getStepNode().getNodeType().equals("path") || routeStepList.get(i+1).getStepNode().getNodeType().equals("intersection")) && ((routeStepList.get(i-1).getStepNode().getNodeType().equals("hall")) || (routeStepList.get(i-1).getStepNode().getNodeType().equals("path")) || routeStepList.get(i-1).getStepNode().getNodeType().equals("intersection"))) {
 				routeStepList.get(i).setIsNavPoint(false);
 				
 				// if this is the first skip, then mark which index, and initialize the distance counter
@@ -1367,12 +1371,12 @@ public class Route {
 			// start node is not a connector node
 			
 			nodeType = routeStepList.get(0).getStepNode().getNodeType();
-			if (nodeType.equals("hall") || nodeType.equals("hall_intersection") || nodeType.equals("stairs")) {
+			if (nodeType.equals("hall") || nodeType.equals("intersection") || nodeType.equals("stairs")) {
 				// start node is a hall type (stairs that are not connectors are considered hall types)
 				
 				// what is the next node type?
 				nodeType = routeStepList.get(1).getStepNode().getNodeType();
-				if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+				if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 					// next node is a hall type
 					myText = "Walk down the hall";
 					
@@ -1395,7 +1399,7 @@ public class Route {
 				
 				// what is the next node type?
 				nodeType = routeStepList.get(1).getStepNode().getNodeType();
-				if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+				if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 					// next node is a hall type
 					myText = "Exit " + routeStepList.get(0).getStepNode().getNodeLabel() + " into the hall";
 					
@@ -1430,7 +1434,7 @@ public class Route {
 				
 				// so what type of node is it?
 				nodeType = routeStepList.get(1).getStepNode().getNodeType();
-				if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+				if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 					// next node is a hall type
 					myText = "Exit " + routeStepList.get(0).getStepNode().getNodeLabel() + " into the hall";
 					
@@ -1461,7 +1465,7 @@ public class Route {
 					
 					// what is the next node type?
 					nodeType = routeStepList.get(i+1).getStepNode().getNodeType();
-					if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+					if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 						// next node is a hall type
 						if (routeStepList.get(i).getDirectionalText().equals("go straight")) {
 							myText = "Continue straight down hall";
@@ -1487,12 +1491,12 @@ public class Route {
 						myText = "Continue following the route";
 					}
 				
-				} else if (nodeType.equals("hall_intersection")) {
+				} else if (nodeType.equals("intersection")) {
 					// this node is a hall intersection
 					
 					// what is the next node type?
 					nodeType = routeStepList.get(i+1).getStepNode().getNodeType();
-					if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+					if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 						// next node is a hall type
 						if (routeStepList.get(i).getDirectionalText().equals("go straight")) {
 							myText = "At hall intersection, " + routeStepList.get(i).getDirectionalText();
@@ -1523,7 +1527,7 @@ public class Route {
 					
 					// what is the next node type?
 					nodeType = routeStepList.get(i+1).getStepNode().getNodeType();
-					if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+					if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 						// next node is a hall type
 						if (routeStepList.get(i).getDirectionalText().equals("go straight")) {
 							myText = "In " + routeStepList.get(i).getStepNode().getNodeLabel() + ", take the exit straight ahead into the hall";
@@ -1571,7 +1575,7 @@ public class Route {
 					
 					// so what type of node is it?
 					nodeType = routeStepList.get(i+1).getStepNode().getNodeType();
-					if (nodeType.equals("hall") || nodeType.equals("hall_intersection")) {
+					if (nodeType.equals("hall") || nodeType.equals("intersection")) {
 						// next node is a hall type
 						myText = "Exit " + routeStepList.get(i).getStepNode().getNodeLabel() + " into the hall";
 						
@@ -1665,6 +1669,13 @@ public class Route {
 		return string;
 	}
 	
+	private int calculateDistance(int x1, int x2, int y1, int y2) {
+		// use pythagorean theorem
+		// the distance between the two points is represented as the hypotenuse of the right triangle created by the two points.
+				
+		return (int) Math.hypot(Math.abs(x1 - x2), Math.abs(y1 - y2));
+	}
+	
 	@Override
 	public String toString() {
 		String output = "";
@@ -1673,7 +1684,7 @@ public class Route {
 		output = output + "Route Steps:" + "\n";
 		for (int i = 0; i < routeStepList.size(); i++) {
 			if (routeStepList.get(i).getIsNavPoint()) {
-				output = output + stepNum + ". " + routeStepList.get(i).getStepText() + ", distance to next step: " + routeStepList.get(i).getDistanceToNextStep() + ", mapImg: " + routeStepList.get(i).getStepNode().getMapImg() + ", floorLevel: " + routeStepList.get(i).getStepNode().getFloorLevel() + ", nodeType: " + routeStepList.get(i).getStepNode().getNodeType() + ", photoImg: " + routeStepList.get(i).getStepNode().getPhotoImg() + ", X: " + routeStepList.get(i).getStepNode().getX() + ", Y: " + routeStepList.get(i).getStepNode().getY() + ", isNavPoint: " + routeStepList.get(i).getIsNavPoint() + ", directionalText: " + routeStepList.get(i).getDirectionalText() + "\n";
+				output = output + stepNum + ". " + routeStepList.get(i).getStepNode().getNodeID() + ". " + routeStepList.get(i).getStepText() + ", distance to next step: " + routeStepList.get(i).getDistanceToNextStep() + ", mapImg: " + routeStepList.get(i).getStepNode().getMapImg() + ", floorLevel: " + routeStepList.get(i).getStepNode().getFloorLevel() + ", nodeType: " + routeStepList.get(i).getStepNode().getNodeType() + ", photoImg: " + routeStepList.get(i).getStepNode().getPhotoImg() + ", X: " + routeStepList.get(i).getStepNode().getX() + ", Y: " + routeStepList.get(i).getStepNode().getY() + ", isNavPoint: " + routeStepList.get(i).getIsNavPoint() + ", directionalText: " + routeStepList.get(i).getDirectionalText() + "\n";
 				stepNum ++;
 			}
 		}
