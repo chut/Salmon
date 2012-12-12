@@ -12,7 +12,7 @@
         android:theme="@android:style/Theme.NoTitleBar">
         <activity
             android:name=".MGHWayFinderActivity"
-            android:label="Delfin" >
+            android:label="Project Salmon" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

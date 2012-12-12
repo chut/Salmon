@@ -200,19 +200,19 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
 			        	double dAngle = stepNode.getNNodeAngle();
 			        	String cardDir  = "Go to ";
 			        	//cardinal directions
-						if(dAngle == 180){
-							Log.v("cardinal", "north");
-							cardDir = "Go North at ";
-						}else if(dAngle == 0){
-							Log.v("cardinal", "south");
-							cardDir = "Go South at ";
-						}else if(dAngle == -90){
-							Log.v("cardinal", "east");
-							cardDir = "Go East at ";
-						}else if(dAngle == 90){
-							Log.v("cardinal", "west");
-							cardDir = "Go West at ";
-						}
+//						if(dAngle == 180){
+//							Log.v("cardinal", "north");
+//							cardDir = "Go North at ";
+//						}else if(dAngle == 0){
+//							Log.v("cardinal", "south");
+//							cardDir = "Go South at ";
+//						}else if(dAngle == -90){
+//							Log.v("cardinal", "east");
+//							cardDir = "Go East at ";
+//						}else if(dAngle == 90){
+//							Log.v("cardinal", "west");
+//							cardDir = "Go West at ";
+//						}
 						//the toast
 						Toast.makeText(PathDrawActivity.this, cardDir + walkNodePath.get(index).getNodeDepartment(), Toast.LENGTH_SHORT).show();
 					}
@@ -229,19 +229,19 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
 			        	double dAngle = stepNode.getNNodeAngle();
 			        	String cardDir  = "Go to ";
 			        	//cardinal directions
-						if(dAngle == 180){
-							Log.v("cardinal", "north");
-							cardDir = "Go North at ";
-						}else if(dAngle == 0){
-							Log.v("cardinal", "south");
-							cardDir = "Go South at ";
-						}else if(dAngle == -90){
-							Log.v("cardinal", "east");
-							cardDir = "Go East at ";
-						}else if(dAngle == 90){
-							Log.v("cardinal", "west");
-							cardDir = "Go West at ";
-						}
+//						if(dAngle == 180){
+//							Log.v("cardinal", "north");
+//							cardDir = "Go North at ";
+//						}else if(dAngle == 0){
+//							Log.v("cardinal", "south");
+//							cardDir = "Go South at ";
+//						}else if(dAngle == -90){
+//							Log.v("cardinal", "east");
+//							cardDir = "Go East at ";
+//						}else if(dAngle == 90){
+//							Log.v("cardinal", "west");
+//							cardDir = "Go West at ";
+//						}
 						//the toast
 						Toast.makeText(PathDrawActivity.this, cardDir + walkNodePath.get(index).getNodeDepartment(), Toast.LENGTH_SHORT).show();
 					}
@@ -299,17 +299,9 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
         
         //PICTURES
       //TODO move this somewhere else (clutter)- create picture list
-        pictures.put("F2-LAB", res.getDrawable(R.drawable.f2_lab));
-        pictures.put("F1-C1_0", res.getDrawable(R.drawable.f1_c1_0));
-        pictures.put("F1-108_0", res.getDrawable(R.drawable.f1_108_0));
-        pictures.put("F1-108R", res.getDrawable(R.drawable.f1_108r));
-        pictures.put("F1-C1_1", res.getDrawable(R.drawable.f1_c1_1));
-        pictures.put("F1-C2_0", res.getDrawable(R.drawable.f1_c2_0));
-        pictures.put("F1-EL", res.getDrawable(R.drawable.f1_el));
-        pictures.put("F1-S2", res.getDrawable(R.drawable.f1_s2));
-        pictures.put("F2-C1_1", res.getDrawable(R.drawable.f2_c1_1));
-        pictures.put("F2-EL", res.getDrawable(R.drawable.f2_el));
-        pictures.put("F2-XR", res.getDrawable(R.drawable.f2_xr));
+//        pictures.put("F2-LAB", res.getDrawable(R.drawable.f2_lab));
+//        pictures.put("F1-C1_0", res.getDrawable(R.drawable.f1_c1_0));
+
         
         
        //populate
