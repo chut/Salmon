@@ -49,7 +49,8 @@ import android.graphics.PorterDuff;
 
 public class MGHWayFinderActivity extends Activity {
 	
-	//
+	//push me and then just touch me till i can get my
+	
 	public static Hashtable<String, Node> masterHash = new Hashtable<String,Node>();			//MASTER HASH TABLE CONTAINING ALL VALID NODES
 	
 	private DBHelper db;
