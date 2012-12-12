@@ -125,8 +125,9 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
 		next.setBackgroundDrawable(res.getDrawable(R.drawable.smallright));
 		prev = (Button)findViewById(R.id.btnPrev);
 		prev.setBackgroundDrawable(res.getDrawable(R.drawable.smallleft));
-		help = (Button)findViewById(R.id.btnHelp);
-		view = (Button)findViewById(R.id.btnView);
+		//TODO remove
+		//help = (Button)findViewById(R.id.btnHelp);
+		//view = (Button)findViewById(R.id.btnView);
         pv = (PathView)findViewById(R.id.pathView);
         am = getAssets();
       
@@ -248,42 +249,9 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
 				}
 		);	
 				
-		help.setOnClickListener(
-				new OnClickListener(){
-					public void onClick(View v){
-						Uri uri = Uri.parse("tel:6177262000");
-						Intent call = new Intent(Intent.ACTION_DIAL,uri);
-						startActivity(call);
-					}
-				}
-		);
 		
-		view.setOnClickListener(
-				new OnClickListener(){
-					public void onClick(View v){
-						
-					fromMap = true;
-					Drawable thePic = res.getDrawable(R.drawable.mgh_logo);
-					
-				        //resolve the image
-				        HashMap<String, String> n = dirList.get(index);
-				        String thenid = n.get("nID");
-				        if(pictures.containsKey(thenid)){
-				        	Log.i("pic", "in if: " + index);
-				        	thePic = pictures.get(thenid);
-				        }else{
-				        	thePic = res.getDrawable(R.drawable.no_img);
-				        }   
-				      //overlay the image
-			        	overlay.setImageDrawable(thePic);
-			        	
-			        	mainFrame.removeAllViews();
-			        	mainFrame.addView(overlayout);
-					}
-				}
-		);
 		
-		view.getBackground().setColorFilter(0xFF6685D1, PorterDuff.Mode.MULTIPLY);
+		//view.getBackground().setColorFilter(0xFF6685D1, PorterDuff.Mode.MULTIPLY);
 	
 		Thread c1 = new Thread(centerOnLoad, "onCreate Centering Thread");
 		c1.start();
@@ -559,17 +527,22 @@ public class PathDrawActivity extends ListActivity implements OnTouchListener{
 		//everything to end is questionable
 		if(floor == 0){
 			if(currentNodeFloor == 0  && outsideHelper == 1){
-				index = walkNodePath.size()-1;
+				if(eFloor == 0){
+					index = walkNodePath.size()-1;
+				}else if(walkNodePath.indexOf(bNode) == index){ 
+					index = index;				
+				}else index = walkNodePath.indexOf(bNode)-1;
 			}
 			
 			if(currentNodeFloor == 0  && outsideHelper == 0){
-				if(walkNodePath.get(index).equals(bNode)){
-					index = walkNodePath.indexOf(bNode) - 2;
-				}
-				index = walkNodePath.indexOf(bNode);				
-				
+				if(sFloor == 0){
+					index = 0;
+				}else if(walkNodePath.indexOf(bNode) == index){ 
+					index--;				
+				}else index = walkNodePath.indexOf(bNode)+1;
 			}
 		}
+		
 		//end
 		if(index < 0) {
 			index = 0;
