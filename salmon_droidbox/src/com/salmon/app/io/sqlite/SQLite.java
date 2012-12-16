@@ -15,21 +15,21 @@ import com.salmon.app.io.Task_DatabaseIO;
 public class SQLite implements IDatabaseProvider {
 	
 	private final SQLiteHelper sqliteHelper;
-	private static SQLite mInstance = null;
+//	private static SQLite mInstance = null;
 	private String[] params;
 	private Context context;
 	private SQLiteDatabase db = null;
 	private Cursor cursor = null;
 	private final ArrayList<String> results = new ArrayList<String>();
 	
-	public static SQLite getInstance(Context context) {
-		if (mInstance == null) {
-			mInstance = new SQLite(context);
-		}
-		return mInstance;
-	}
+//	public static SQLite getInstance(Context context) {
+//		if (mInstance == null) {
+//			mInstance = new SQLite(context);
+//		}
+//		return mInstance;
+//	}
 	
-	private SQLite(Context context) {
+	public SQLite(Context context) {
 		this.context = context;
 		
 		// setup helper

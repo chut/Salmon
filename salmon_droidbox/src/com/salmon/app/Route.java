@@ -93,15 +93,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 									
 			break;
@@ -136,15 +136,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
@@ -200,15 +200,15 @@ public class Route {
 			break;
 		
 		case AppConstants.PROVIDER_INT_SQLITE:
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 						
 			break;
@@ -387,15 +387,15 @@ public class Route {
 			break;
 			
 		case AppConstants.PROVIDER_INT_SQLITE:
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - SQLITE");
 			break;
 		
 		default:
 			// default to SQLITE
-			//dbConn = new SQLite(context);
-			dbConn = SQLite.getInstance(context);
+			dbConn = new SQLite(context);
+			//dbConn = SQLite.getInstance(context);
 			Log.i("ROUTE","Provider - defaulting to SQLITE");
 			
 			break;
