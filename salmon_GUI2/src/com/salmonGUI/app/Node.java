@@ -2,6 +2,8 @@ package com.salmonGUI.app;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
 
 public class Node {
 
@@ -106,8 +108,10 @@ public class Node {
 	
 	public Neighbor addNeighbor(Node nodeObj, int distanceToNeighbor) {
 		Neighbor x1 = new Neighbor(nodeObj, nodeObj.getNodeID(), distanceToNeighbor);
-		neighborList.add(x1);
 		x1.setParentNode(this);
+		Log.i("ROUTE","   neighbor: " + x1.getNode().getNodeID() + ", nodeID: " + x1.getNodeID() + ", distance: " + x1.getDistance() + ", parent: " + x1.getParentNode().getNodeID());
+		neighborList.add(x1);
+		
 		
 		return x1;
 	}

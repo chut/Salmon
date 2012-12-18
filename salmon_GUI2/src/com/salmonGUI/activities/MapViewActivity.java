@@ -13,8 +13,7 @@ import android.widget.TextView;
 
 public class MapViewActivity extends Activity {
 	private TextView textView;
-	private String mode, startID, endID, soe;
-	private boolean verbose;
+	private String mode, startID, endID, soe, verbose;
 	
 	private AppIO appIO;
 	private Route r2;
@@ -32,8 +31,9 @@ public class MapViewActivity extends Activity {
 		
 		startID = AppPrefs.getStartID(this);
 		endID = AppPrefs.getEndID(this);
-		verbose = AppPrefs.getVerbose(this);
-		soe = AppPrefs.getStairs(this);
+		String bVerbose = AppPrefs.getVerbose(this)? "true":"false";
+		verbose = "verbose=" + bVerbose;
+		soe = "soe=" + AppPrefs.getStairs(this);
 		
 		appIO = new AppIO(AsyncConstants.DEFAULT_THREAD_POOL_SIZE);
 		r2 = Route.getInstance(this);
@@ -54,7 +54,7 @@ public class MapViewActivity extends Activity {
     		textView.append("\n");
     		textView.append("initializing algorithm....\n");
     		
-    		r2.setup("testRoute2", startID, endID, verbose? "true": "false", soe);
+    		r2.setup("testRoute2", startID, endID, verbose, soe);
     		
     		textView.append("startNode: " + r2.getStartNodeID() + "\n");
     		textView.append("endNode: " + r2.getEndNodeID() + "\n");

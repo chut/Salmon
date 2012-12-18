@@ -505,7 +505,7 @@ public class SQLite implements IDatabaseProvider {
 		StringBuilder sbSQL = new StringBuilder(512);
 		if (params.length == 1) {
 			// nodeID (params[0]) was passed.  base SQL off nodeID
-			//Log.i("SQLITE","base SQL off nodeID: " + params[0]);
+			Log.i("SQLITE","base SQL off nodeID: " + params[0]);
 			sbSQL.append(DatabaseConstants.SQL_NODEID_1);
 			sbSQL.append(params[0]);
 			sbSQL.append(DatabaseConstants.SQL_NODEID_2);
@@ -518,7 +518,7 @@ public class SQLite implements IDatabaseProvider {
 		
 		} else {
 			// buildingID (params[0]) and floorID (params[1]) were passed.  base SQL off of those.
-			//Log.i("SQLITE","base SQL off buildingID and floorID: " + params[0] + ", " + params[1]);
+			Log.i("SQLITE","base SQL off buildingID and floorID: " + params[0] + ", " + params[1]);
 			sbSQL.append(DatabaseConstants.SQL_BLDFLR_1);
 			sbSQL.append(params[0]);
 			sbSQL.append(DatabaseConstants.SQL_BLDFLR_2);
