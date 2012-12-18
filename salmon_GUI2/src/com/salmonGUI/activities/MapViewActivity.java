@@ -81,10 +81,8 @@ public class MapViewActivity extends Activity {
 //		int nodeX = r2.getRouteStepList().get(1).getStepNode().getX();
 //		Log.v("node", Integer.toString(nodeX));
 		
-		int nodex = routePut.get(1).getStepNode().getX();
-		Log.v("X", Integer.toString(nodex));
-		int nodey = routePut.get(1).getStepNode().getY();
-		Log.v("Y", Integer.toString(nodey));
+		
+		
 		
 		
 	}//end oncreate
@@ -95,7 +93,17 @@ public class MapViewActivity extends Activity {
 		textView.append(routeObj.getMyMetrics().toString() + "\n");
 		
 		routePut = routeObj.getRouteStepList();
-	}
+		
+		
+		for(int i = 0; i < routePut.size(); i++){
+			int nodex = routePut.get(i).getStepNode().getX();
+			Log.v("X", Integer.toString(nodex));
+			int nodey = routePut.get(i).getStepNode().getY();
+			Log.v("Y", Integer.toString(nodey));
+			//boolean nod = routePut.get(1).getStepNode().
+		}
+		
+	}//end routeconvert
 	
 	
 	
