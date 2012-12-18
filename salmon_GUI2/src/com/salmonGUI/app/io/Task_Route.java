@@ -1,11 +1,13 @@
 package com.salmonGUI.app.io;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.salmonGUI.activities.MapViewActivity;
 import com.salmonGUI.app.Route;
 import com.salmonGUI.app.async_core.TaskBase;
 import com.salmonGUI.app.async_core.UIHandler;
@@ -14,15 +16,15 @@ public class Task_Route<E1, E2> extends TaskBase<Integer, E1, E2> {
 	
 	private final Context context;
 	private final Route route;
-	private final TextView element; 	// element to be updated - i.e. ArrayList, TextView, etc...
+	private final MapViewActivity callback; 	// element to be updated - i.e. ArrayList, TextView, etc...
 	
 	/* UI Thread */
-	public Task_Route(Context context, UIHandler handlerUI, Route route, TextView element) {
+	public Task_Route(Context context, UIHandler handlerUI, Route route, MapViewActivity callback) {
 		super(handlerUI);
 		this.context = context;
 		
 		this.route = route;
-		this.element = element;		
+		this.callback = callback;		
 	}
 
 	/* Separate Thread */
@@ -40,9 +42,11 @@ public class Task_Route<E1, E2> extends TaskBase<Integer, E1, E2> {
 			Log.i("ROUTE","posting results");
 			this.handlerUI.post(new Runnable() {
 				public void run() {
-					element.append("runResult = " + result + "\n");
-					element.append(route.toString() + "\n");
-					element.append(route.getMyMetrics().toString() + "\n");
+//					element.append("runResult = " + result + "\n");
+//					element.append(route.toString() + "\n");
+//					element.append(route.getMyMetrics().toString() + "\n");
+					
+					callback.routeConvertData(route);
 				}
 			});
 		}

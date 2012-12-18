@@ -1,13 +1,16 @@
 package com.salmonGUI.activities;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.salmonGUI.app.async_core.AsyncConstants;
 import com.salmonGUI.app.io.AppIO;
 import com.salmonGUI.app.Route;
+import com.salmonGUI.app.RouteStep;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -17,7 +20,7 @@ public class MapViewActivity extends Activity {
 	
 	private AppIO appIO;
 	private Route r2;
-	
+	ArrayList<RouteStep> routePut;
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class MapViewActivity extends Activity {
     		textView.append("stairsOrElevator: " + soe + "\n");
     		
     		textView.append("\n");
-    		textView.append("---------------------------------------------------\n");
+    		textView.append("-------------------here i am --------------------\n");
     		textView.append("\n");
     		
     		textView.append("Algorithm started at " + new Date() + "\n");
@@ -69,14 +72,32 @@ public class MapViewActivity extends Activity {
     		textView.append("\n");
     		textView.append("---------------------------------------------------\n");
     		
-    		appIO.calculateRoute(this, r2, textView);
-    		
+    		appIO.calculateRoute(this, r2, this);
+    		//ned to get these return values in a reasonable way 
     	} else {
     		textView.append("error passing data\n");
     	}
 		
+//		int nodeX = r2.getRouteStepList().get(1).getStepNode().getX();
+//		Log.v("node", Integer.toString(nodeX));
 		
-	    
-	}
+		int nodex = routePut.get(1).getStepNode().getX();
+		Log.v("X", Integer.toString(nodex));
+		int nodey = routePut.get(1).getStepNode().getY();
+		Log.v("Y", Integer.toString(nodey));
+		
+		
+	}//end oncreate
 
+	public void routeConvertData(Route routeObj) {
+		//textView.append("runResult = " + result + "\n");
+		textView.append(routeObj.toString() + "\n");
+		textView.append(routeObj.getMyMetrics().toString() + "\n");
+		
+		routePut = routeObj.getRouteStepList();
+	}
+	
+	
+	
+	
 }

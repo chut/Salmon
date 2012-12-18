@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.salmonGUI.activities.MapViewActivity;
 import com.salmonGUI.app.AppConstants;
 import com.salmonGUI.app.Route;
 import com.salmonGUI.app.async_core.PostRunnableBase;
@@ -27,9 +28,9 @@ private final UIHandler handlerUI;
 	}
 	
 	// calculate route
-	public int calculateRoute(Context context, Route route, TextView textview) {
+	public int calculateRoute(Context context, Route route, MapViewActivity activity) {
 		// create task
-		Task_Route<String, String> routeTask = new Task_Route<String, String>(context, handlerUI, route, textview);
+		Task_Route<String, String> routeTask = new Task_Route<String, String>(context, handlerUI, route, activity);
 		
 		// attach progress dialog
 		routeTask.addProgressDialog(context, null, "Working, please wait...");	// TODO refactor this to use @String
